@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@coinbase/onchainkit": "^0.38.19",
+    "tailwindcss": "^4.1.12"
+  }
+}
