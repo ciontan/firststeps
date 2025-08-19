@@ -1,7 +1,7 @@
-import { COINBASE_COMMERCE_API_KEY } from 'src/config';
-import { COMMERCE_API_URL } from 'src/links';
+import { COINBASE_COMMERCE_API_KEY } from '../../config';
+import { COMMERCE_API_URL } from '../../links';
 import { NextResponse } from 'next/server';
-import type { ChargeDetails } from 'src/types';
+import type { ChargeDetails } from '../../types';
 
 export async function POST(request: Request) {
   if (!COINBASE_COMMERCE_API_KEY) {
@@ -29,9 +29,10 @@ export async function POST(request: Request) {
         status: res.status,
         statusText: res.statusText,
         errorText,
+        requestBody: chargeDetails, // Log what we're sending
       });
       return NextResponse.json(
-        { error: `HTTP error! status: ${res.status}` },
+        { error: errorText || `HTTP error! status: ${res.status}` },
         { status: res.status },
       );
     }

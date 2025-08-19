@@ -1,14 +1,14 @@
-import { useCallback, useMemo } from 'react';
-import { useOnchainStoreContext } from './OnchainStoreProvider';
-// import useCreateCharge from 'src/hooks/useCreateCharge';
-// import {
-//   Checkout,
-//   CheckoutButton,
-//   LifecycleStatus,
-// } from '@coinbase/onchainkit/checkout';
-import type { OnchainStoreCartReact } from '../types';
-import OnchainStoreModal from './OnchainStoreModal';
-import { MockCheckoutButton } from './MockCheckoutButton';
+import { useCallback, useMemo } from "react";
+import { useOnchainStoreContext } from "./OnchainStoreProvider";
+import useCreateCharge from "../hooks/useCreateCharge";
+import {
+  Checkout,
+  CheckoutButton,
+  LifecycleStatus,
+} from "@coinbase/onchainkit/checkout";
+import type { OnchainStoreCartReact } from "../types";
+import OnchainStoreModal from "./OnchainStoreModal";
+import { MockCheckoutButton } from "./MockCheckoutButton";
 
 export default function OnchainStoreCart({
   setShowModal,
@@ -27,36 +27,46 @@ export default function OnchainStoreCart({
 
   // TODO: comment back in to enable checkout flow
 
-  // const { createCharge } = useCreateCharge();
+  const { createCharge } = useCreateCharge();
 
-  // const handleStatusChange = useCallback((status: LifecycleStatus) => {
-  //   console.log('onStatus', status);
-  // }, []);
+  const handleStatusChange = useCallback((status: LifecycleStatus) => {
+    console.log("onStatus", status);
+  }, []);
 
-  // const chargeHandler = useCallback(() => {
-  //   const description = Object.keys(quantities)
-  //     .map((productId) => {
-  //       return `${productId}(${quantities[productId]})`;
-  //     })
-  //     .join(',');
-  //   const chargeDetails = {
-  //     name: 'commerce template charge',
-  //     description,
-  //     pricing_type: 'fixed_price',
-  //     local_price: {
-  //       amount: totalSum.toString(),
-  //       currency: 'USD',
-  //     },
-  //   };
-  //   return createCharge(chargeDetails);
-  // }, [createCharge, quantities, totalSum]);
+  const chargeHandler = useCallback(() => {
+    // Check minimum amount requirement
+    if (totalSum < 0.001) {
+      throw new Error("Minimum order amount is $0.001 USD");
+    }
 
-  // const key = useMemo(() => {
-  //   if (!quantities) return '';
-  //   const productIds = Object.keys(quantities);
-  //   const values = Object.values(quantities).flat();
-  //   return `${productIds.join('.')}-${values.join('.')}`;
-  // }, [quantities]);
+    const description = Object.keys(quantities)
+      .map((productId) => {
+        return `${productId}(${quantities[productId]})`;
+      })
+      .join(",");
+    const chargeDetails = {
+      name: "Secondhand Store Purchase",
+      description,
+      pricing_type: "fixed_price",
+      local_price: {
+        amount: totalSum.toFixed(2), // Ensure 2 decimal places
+        currency: "USD",
+      },
+      redirect_url: window.location.href, // Add redirect URL
+      cancel_url: window.location.href, // Add cancel URL
+      metadata: {
+        products: Object.keys(quantities).join(","),
+      },
+    };
+    return createCharge(chargeDetails);
+  }, [createCharge, quantities, totalSum]);
+
+  const key = useMemo(() => {
+    if (!quantities) return "";
+    const productIds = Object.keys(quantities);
+    const values = Object.values(quantities).flat();
+    return `${productIds.join(".")}-${values.join(".")}`;
+  }, [quantities]);
 
   const closeModal = useCallback(() => {
     setShowModal?.(false);
@@ -88,20 +98,20 @@ export default function OnchainStoreCart({
             </h2>
             <div className="w-64">
               {/* TODO: comment back in to enable checkout flow */}
-              {/* <Checkout
+              <Checkout
                 key={key}
                 onStatus={handleStatusChange}
                 chargeHandler={chargeHandler}
               >
                 <CheckoutButton
                   coinbaseBranded={true}
-                  text="Pay with Crypto"
-                  disabled={!totalSum}
+                  text={totalSum < 0.001 ? "Minimum $0.001" : "Pay with Crypto"}
+                  disabled={!totalSum || totalSum < 0.001}
                 />
-              </Checkout> */}
+              </Checkout>
 
               {/* TODO: remove, for demo purposes only */}
-              <MockCheckoutButton onClick={openModal} />
+              {/* <MockCheckoutButton onClick={openModal} /> */}
             </div>
           </div>
         </div>
