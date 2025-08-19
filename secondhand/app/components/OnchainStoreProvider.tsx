@@ -1,11 +1,8 @@
-import { createContext, useContext, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
-import type { OnchainStoreContextType } from '../types';
-import jacketImage from '../images/jacket.png';
-import airpodsImage from '../images/airpods.png';
-import mugImage from '../images/mug.png';
-import bottleImage from '../images/bottle.png';
-import type { Product } from '../types';
+import { createContext, useContext, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import type { OnchainStoreContextType } from "../types";
+import type { Product } from "../types";
+import { products } from "../data/products";
 
 const emptyContext = {} as OnchainStoreContextType;
 
@@ -16,45 +13,64 @@ type OnchainStoreProviderReact = {
   children: ReactNode;
 };
 
-const products: Product[] = [
-  { id: 'product1', name: `'BUILDER' JACKET`, price: 0.04, image: jacketImage },
-  {
-    id: 'product2',
-    name: `'DND, I'M BUILDING' AIRPODS`,
-    price: 0.01,
-    image: airpodsImage,
-  },
-  {
-    id: 'product3',
-    name: `'CAFFEINATED TO BUILD' MUG`,
-    price: 0.02,
-    image: mugImage,
-  },
-  {
-    id: 'product4',
-    name: `'HYDRATED TO BUILD' BOTTLE`,
-    price: 0.01,
-    image: bottleImage,
-  },
-];
-
 export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
-  const [quantities, setQuantities] = useState({});
-  const value = useMemo(() => {
-    return {
-      quantities,
-      setQuantities,
-      products,
-    };
-  }, [quantities]);
+  const [cart, setCart] = useState<Record<string, number>>({});
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const isInCart = useMemo(
+    () => (productId: string) => Boolean(cart[productId]),
+    [cart],
+  );
+
+  const addToCart = (productId: string) => {
+    setCart((c) => ({
+      ...c,
+      [productId]: (c[productId] || 0) + 1,
+    }));
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCart((c) => {
+      const { [productId]: _, ...rest } = c;
+      return rest;
+    });
+  };
+
+  const amount = useMemo(() => {
+    let total = 0;
+    for (const [productId, quantity] of Object.entries(cart)) {
+      const product = products.find((p) => p.id === productId);
+      if (product) {
+        total += product.price * quantity;
+      }
+    }
+    return total;
+  }, [cart]);
 
   return (
-    <OnchainStoreContext.Provider value={value}>
+    <OnchainStoreContext.Provider
+      value={{
+        products,
+        quantities: cart,
+        isOpen,
+        setIsOpen,
+        isInCart,
+        addToCart,
+        removeFromCart,
+        amount,
+      }}
+    >
       {children}
     </OnchainStoreContext.Provider>
   );
 }
 
-export function useOnchainStoreContext() {
-  return useContext(OnchainStoreContext);
+export default function useOnchainStoreContext() {
+  const context = useContext(OnchainStoreContext);
+
+  if (!context) {
+    throw new Error("Please wrap your app with OnchainStoreProvider");
+  }
+
+  return context;
 }

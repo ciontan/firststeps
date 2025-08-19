@@ -1,23 +1,32 @@
-import type { Product } from '../types';
-import Image from 'next/image';
-import QuantityInput from './QuantityInput';
+import type { Product } from "../types";
+import Image from "next/image";
+import QuantityInput from "./QuantityInput";
+import Link from "next/link";
 
 export default function OnchainStoreItem({ id, name, price, image }: Product) {
   return (
-    <div className="store-item mx-auto flex w-full flex-col p-4 sm:mx-0 lg:p-6">
-      <div className="mb-1 flex items-start justify-between">
-        <h2 className="font-regular text-xs">{name}</h2>
-      </div>
-      <div className="flex grow justify-center md:relative">
+    <div className="bg-white rounded-2xl shadow-md flex flex-col w-full max-w-xs mx-auto p-0 overflow-hidden border border-gray-100">
+      <div className="relative w-full h-48 bg-gray-50">
         <Image
           src={image}
-          alt="123"
-          className="mx-auto object-contain max-sm:max-w-[300px] md:absolute md:h-full md:w-auto"
+          alt="Product image"
+          fill
+          className="object-contain"
         />
       </div>
-      <div className="flex items-center justify-between">
-        <p className="font-regular text-xs">{price.toFixed(2)} USDC</p>
-        <QuantityInput productId={id} />
+      <div className="flex flex-col px-4 py-3 grow">
+        <h2 className="font-wix mb-2 line-clamp-2">{name}</h2>
+        <div className="flex items-center justify-between mb-2">
+          <p className="font-wix font-bold text-auto text-gray-900">
+            ${price.toFixed(2)}
+          </p>
+        </div>
+        <Link
+          href={`/item/${id}`}
+          className="mt-auto w-full py-2 rounded-xl bg-brown text-white font-medium text-sm shadow-md transition hover:bg-brown-700 text-center block"
+        >
+          More Details
+        </Link>
       </div>
     </div>
   );

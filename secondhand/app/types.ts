@@ -1,5 +1,5 @@
-import type { StaticImageData } from 'next/image';
-import type { ReactNode } from 'react';
+import type { StaticImageData } from "next/image";
+import type { ReactNode } from "react";
 
 export type NavbarLinkReact = {
   link: string;
@@ -17,14 +17,6 @@ export type Quantities = Record<string, number>;
 
 export type QuantityInputReact = {
   productId: string;
-};
-
-export type OnchainStoreContextType = {
-  quantities: Quantities;
-  setQuantities: (
-    quantities: Quantities | ((prev: Quantities) => Quantities),
-  ) => void;
-  products?: Product[];
 };
 
 export type QuantityInputButtonReact = {
@@ -54,4 +46,15 @@ export type ChargeDetails = {
     amount: string;
     currency: string;
   };
+};
+
+export type OnchainStoreContextType = {
+  products: Product[];
+  quantities: Record<string, number>;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  isInCart: (productId: string) => boolean;
+  addToCart: (productId: string) => void;
+  removeFromCart: (productId: string) => void;
+  amount: number;
 };

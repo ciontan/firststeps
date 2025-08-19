@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useOnchainStoreContext } from "./OnchainStoreProvider";
+import useOnchainStoreContext from "./OnchainStoreProvider";
 import useCreateCharge from "../hooks/useCreateCharge";
 import {
   Checkout,

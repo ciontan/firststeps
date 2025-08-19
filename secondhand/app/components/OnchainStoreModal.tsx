@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import CommerceScreenImage from '../images/commerceScreen.png';
+import CommerceScreenImage from '../../public/images/commerceScreen.png';
 import type { OnchainStoreModalReact } from '../types';
 import { GITHUB_LINK } from '../links';
 import { CloseSvg } from '../svg/CloseSvg';
