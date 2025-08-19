@@ -8,9 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily:{
+        wix: ["Wix Madefor Text", "sans-serif"],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        brown: "#601816",
       },
       animation: {
         "fade-out": "1s fadeOut 3s ease-out forwards",

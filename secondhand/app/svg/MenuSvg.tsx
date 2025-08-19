@@ -1,13 +1,12 @@
-export function MenuSvg() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-    >
-      <title>MenuSvg</title>
-      <path d="M24 6h-24v-4h24v4zm0 4h-24v4h24v-4zm0 8h-24v4h24v-4z" />
-    </svg>
-  );
-}
+import { SVGProps } from "react";
+
+const MenuSvg = (props: SVGProps<SVGSVGElement>) => (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 12H20" stroke="#601816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M4 18H20" stroke="#601816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M4 6H20" stroke="#601816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
+
+);
+
+export default MenuSvg;
