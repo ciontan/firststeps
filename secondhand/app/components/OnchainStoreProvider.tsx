@@ -6,7 +6,7 @@ import {
   fetchProductsFromFirestore,
   searchProducts,
   filterProductsByCategory,
-} from "../services/firebaseService.jsx";
+} from "../services/firebaseService.tsx";
 
 const emptyContext = {} as OnchainStoreContextType;
 

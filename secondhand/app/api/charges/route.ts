@@ -1,4 +1,4 @@
-import { COMMERCE_API_URL } from "../../links.js";
+import { COMMERCE_API_URL } from "../../links";
 import { NextResponse } from "next/server";
 import type { ChargeDetails } from "../../types.js";
 
