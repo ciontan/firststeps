@@ -1,12 +1,12 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from "react";
 import type {
   Quantities,
   QuantityInputButtonReact,
   QuantityInputReact,
-} from '../types';
-import { useOnchainStoreContext } from './OnchainStoreProvider';
-import PlusSvg from '../svg/PlusSvg';
-import MinusSvg from '../svg/MinusSvg';
+} from "../types";
+import useOnchainStoreContext from "./OnchainStoreProvider";
+import PlusSvg from "../svg/PlusSvg";
+import MinusSvg from "../svg/MinusSvg";
 
 function QuantityInputButton({
   onClick,
@@ -26,24 +26,21 @@ function QuantityInputButton({
 }
 
 export default function QuantityInput({ productId }: QuantityInputReact) {
-  const { quantities, setQuantities } = useOnchainStoreContext();
+  const { quantities, addToCart, removeFromCart } = useOnchainStoreContext();
 
   const currentItemQuantity = useMemo(() => {
     return quantities[productId] || 0;
   }, [quantities, productId]);
 
   const handleIncrement = useCallback(() => {
-    setQuantities((prev: Quantities) => {
-      return { ...prev, [productId]: currentItemQuantity + 1 };
-    });
-  }, [currentItemQuantity, productId, setQuantities]);
+    addToCart(productId);
+  }, [addToCart, productId]);
 
   const handleDecrement = useCallback(() => {
-    const newQuantity = Math.max(0, currentItemQuantity - 1);
-    setQuantities((prev: Quantities) => {
-      return { ...prev, [productId]: newQuantity };
-    });
-  }, [currentItemQuantity, productId, setQuantities]);
+    if (currentItemQuantity > 0) {
+      removeFromCart(productId);
+    }
+  }, [currentItemQuantity, removeFromCart, productId]);
 
   return (
     <div className="flex items-center space-x-2">
