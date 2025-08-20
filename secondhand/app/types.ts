@@ -93,14 +93,16 @@ export type ChargeDetails = {
   };
 };
 
-export type OnchainStoreContextType = {
+export interface OnchainStoreContextType {
   products: Product[];
   quantities: Record<string, number>;
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
+  setIsOpen: (open: boolean) => void;
   isInCart: (productId: string) => boolean;
   addToCart: (productId: string) => void;
   removeFromCart: (productId: string) => void;
   amount: number;
-  loading?: boolean;
-};
+  loading: boolean;
+}
+
+
