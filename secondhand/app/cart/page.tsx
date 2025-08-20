@@ -1,251 +1,185 @@
 "use client";
 import { useState } from "react";
-import { ShoppingCart, Menu, ChevronDown, ChevronUp } from "lucide-react";
-import { About } from "../svg/About";
 import { useCartStore } from "../store/cartStore";
-import { Vision } from "../svg/Vision";
-import { Values } from "../svg/Values";
-import { Successful } from "../svg/Successful";
-import { Pending } from "../svg/Pending";
-import { Rejected } from "../svg/Rejected";
-import { Listing } from "../svg/Listing";
-import { Cart } from "../svg/Cart";
+import type { Product } from "../types";
+import Navbar from "../components/Navbar";
 import Link from "next/link";
-import All from "../svg/Categories/All";
+import { Cart } from "../svg/Cart";
+
+interface CartItem extends Product {
+  quantity: number;
+  status: "successful" | "pending" | "rejected";
+}
+
+const TAB_LIST = [
+  { key: "successful", label: "Successful" },
+  { key: "pending", label: "Pending" },
+  { key: "rejected", label: "Rejected" },
+];
 
 export default function ShoppingCartHeader() {
-  const [isOpen, setIsOpen] = useState(false);
-  const cartItems = useCartStore((state) => state.items);
+  const cartItems = useCartStore((state) => state.items) as CartItem[];
+  const [activeTab, setActiveTab] = useState("successful");
 
-  // Section expand/collapse state
-  const [profileOpen, setProfileOpen] = useState(true);
-  const [cartOpen, setCartOpen] = useState(true);
-  const [homeOpen, setHomeOpen] = useState(true);
-  const [exploreOpen, setExploreOpen] = useState(true);
+  // Filter items by status
+  const filteredItems = cartItems.filter((item) => item.status === activeTab);
 
-  // SVG imports
-  const Icons = {
-    Essentials: require("../svg/Categories/Essentials").default,
-    Clothes: require("../svg/Categories/Clothes").default,
-    Toys: require("../svg/Categories/Toys").default,
-    Furniture: require("../svg/Categories/Furniture").default,
-    Learning: require("../svg/Categories/Learning").default,
-    Sports: require("../svg/Categories/Sports").default,
-    // Add other icons as needed
-  };
+  // Count items per tab
+  const tabCounts = TAB_LIST.reduce(
+    (acc, tab) => {
+      acc[tab.key] = cartItems.filter((item) => item.status === tab.key).length;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return (
-    <>
-      <nav className="fixed top-0 z-[55] w-full bg-white border-b border-gray-200">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <button
-                onClick={() => setIsOpen(true)}
-                className="inline-flex items-center justify-center rounded-md text-brown hover:text-brown hover:bg-[#FFEFE3] focus:outline-none"
+    <div className="min-h-screen min-w-screen bg-white">
+      <Navbar
+        centerContent={
+          <h1 className="text-lg font-bold font-wix text-brown">
+            Shopping Cart ({cartItems.length})
+          </h1>
+        }
+      />
+      <div className="pt-20 px-4 max-w-4xl mx-auto">
+        <div className="flex gap-3 overflow-x-auto whitespace-nowrap pb-2">
+          {TAB_LIST.map((tab) => (
+            <button
+              key={tab.key}
+              className={`flex flex-row items-center gap-2 py-2 px-2 sm:px-4 font-wix text-base sm:text-lg transition-colors
+                  ${activeTab === tab.key ? "text-brown border-b-2 border-brown" : "text-gray-400"}
+                `}
+              onClick={() => setActiveTab(tab.key)}
+              style={{ minWidth: "80px" }}
+            >
+              <span className="text-base">{tab.label}</span>
+              <span
+                className={`text-lg font-wix ${activeTab === tab.key ? "text-brown" : "text-gray-400"}`}
               >
-                <Menu className="block h-6 w-6 text-brown" />
-              </button>
-            </div>
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold font-wix text-brown">
-                Shopping Cart ({cartItems.length})
-              </h1>
-            </div>
-            <div className="flex items-center relative">
-              <Link href="/cart">
-                <div className="relative">
-                  <ShoppingCart className="text-brown" />
-                  {cartItems.length > 0 && (
-                    <div
-                      className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                      style={{
-                        top: "-6px",
-                        right: "-3px",
-                        transform: "translate(50%,-50%)",
-                        zIndex: 1,
-                      }}
-                    >
-                      {cartItems.length}
-                    </div>
-                  )}
-                </div>
+                ({tabCounts[tab.key]})
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Empty State or Cart Items */}
+        <div className="space-y-3 mt-6">
+          {filteredItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 px-4">
+              <Cart className="w-16 h-16 text-brown mb-6" />
+              <h2 className="text-lg sm:text-xl font-bold text-brown mb-2 text-center">
+                Add an item to your cart
+              </h2>
+              <p className="text-gray-500 mb-8 text-center">
+                Help reduce waste!
+              </p>
+              <Link
+                href="/"
+                className="bg-brown text-white rounded-full px-8 py-3 font-bold text-lg hover:bg-opacity-90 transition-colors"
+              >
+                Marketplace
               </Link>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-3 pb-32">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center bg-[#FFF7F3] rounded-2xl p-3 gap-4"
+                >
+                  <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 flex-shrink-0">
+                    <img
+                      src={item.image.toString()}
+                      alt={item.name}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-2">
+                      {item.name}
+                    </h3>
+                    <div className="flex flex-wrap gap-2 items-center text-xs sm:text-sm text-gray-600 mt-1">
+                      <span>{item.brand}</span>
+                      {item.condition && (
+                        <>
+                          <span>•</span>
+                          <span>{item.condition}</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base sm:text-lg font-semibold text-brown">
+                          ${item.price.toFixed(2)}
+                        </span>
+                        {item.quantity > 1 && (
+                          <span className="text-sm text-gray-500">
+                            × {item.quantity}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="p-2 text-brown hover:text-brown/80 self-start"
+                    onClick={() => useCartStore.getState().removeItem(item.id)}
+                    aria-label="Remove"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </nav>
 
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[65]"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Side Navigation Panel */}
-      <div
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-[70] ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* Close button */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold font-wix text-brown">Menu</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 rounded-md text-brown hover:bg-[#FFEFE3]"
-          >
-            <svg
-              className="h-6 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Navigation items - custom layout */}
-        <nav className="mt-4 px-8 font-wix text-brown">
-          {/* Home Section */}
-          <div className="mb-6">
-            <div
-              className="flex items-center justify-between mb-2 cursor-pointer"
-              onClick={() => setHomeOpen(!homeOpen)}
-            >
-              <span className="text-xl font-bold font-wix">Home</span>
-              {homeOpen ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </div>
-            {homeOpen && (
-              <div className="space-y-2 ml-1">
-                <div className="font-wix flex items-center gap-2 text-md">
-                  <About className="w-6 h-6" />
-                  About us
-                </div>
-                <div className="font-wix flex items-center gap-2 text-md">
-                  <Vision className="w-6 h-6" />
-                  Our Vision
-                </div>
-                <div className="font-wix flex items-center gap-2 text-md">
-                  <Values className="w-6 h-6" />
-                  Our Values
-                </div>
+        {/* Checkout Bar - Only show when there are items */}
+        {filteredItems.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+            <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center px-4 py-4 gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600">Total:</span>
+                <span className="font-bold text-brown text-lg sm:text-xl">
+                  $
+                  {filteredItems
+                    .reduce(
+                      (sum, item) => sum + item.price * (item.quantity || 1),
+                      0,
+                    )
+                    .toFixed(2)}
+                </span>
               </div>
-            )}
-          </div>
-          {/* Explore Section */}
-          <div className="mb-6">
-            <div
-              className="flex items-center justify-between mb-2 cursor-pointer"
-              onClick={() => setExploreOpen(!exploreOpen)}
-            >
-              <span className="text-xl font-bold font-wix">Explore</span>
-              {exploreOpen ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </div>
-            {exploreOpen && (
-              <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <All className="w-6 h-6" />
-                  All
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <Icons.Essentials className="w-6 h-6" />
-                  Baby Essentials
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <Icons.Clothes className="w-6 h-6" />
-                  Clothes
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <Icons.Toys className="w-6 h-6" />
-                  Toys
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <Icons.Furniture className="w-6 h-6" />
-                  Furniture
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <Icons.Learning className="w-6 h-6" />
-                  Learning
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
-                  <Icons.Sports className="w-6 h-6" />
-                  Sports
-                </div>
+              <div className="flex w-full sm:w-auto gap-2">
+                <button className="flex-1 sm:flex-none bg-brown text-white rounded-full px-8 py-3 font-bold text-base">
+                  Check out
+                </button>
+                <button
+                  className="flex-1 sm:flex-none bg-gray-400 text-white rounded-full px-8 py-3 font-bold text-base flex flex-col items-center justify-center"
+                  disabled
+                >
+                  <span>Chat</span>
+                  <span className="text-[11px] text-white/70">
+                    Working on it
+                  </span>
+                </button>
               </div>
-            )}
-          </div>
-          {/* Profile Section */}
-          <div className="mb-6">
-            <div
-              className="flex items-center justify-between mb-2 cursor-pointer"
-              onClick={() => setProfileOpen(!profileOpen)}
-            >
-              <span className="text-xl font-wix font-bold">Your Profile</span>
-              {profileOpen ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
             </div>
-            {profileOpen && (
-              <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 text-md font-wix">
-                  <Listing className="w-6 h-6" />
-                  Listings
-                </div>
-              </div>
-            )}
           </div>
-          {/* Cart Section */}
-          <div className="mb-6">
-            <div
-              className="flex items-center justify-between mb-2 cursor-pointer"
-              onClick={() => setCartOpen(!cartOpen)}
-            >
-              <span className="text-xl font-wix font-bold">Your Cart</span>
-              {cartOpen ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </div>
-            {cartOpen && (
-              <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 text-md font-wix">
-                  <Successful className="w-6 h-6" />
-                  Successful
-                </div>
-                <div className="flex items-center gap-2 text-md font-wix">
-                  <Pending className="w-6 h-6" />
-                  Pending
-                </div>
-                <div className="flex items-center gap-2 text-md font-wix">
-                  <Rejected className="w-6 h-6" />
-                  Rejected
-                </div>
-              </div>
-            )}
-          </div>
-        </nav>
+        )}
       </div>
-    </>
+    </div>
   );
 }
