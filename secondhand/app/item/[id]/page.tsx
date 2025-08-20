@@ -1,22 +1,68 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { products } from "../../data/products";
+import { useEffect, useState } from "react";
+import { fetchProductByIdFromFirestore } from "../../services/firebaseService";
+import type { Product } from "../../types";
 import Image from "next/image";
 import { ShoppingCart, Star, MapPin, Check } from "lucide-react";
 import Navbar from "../../components/Navbar";
-import { useState } from "react";
 import { useCartStore } from "../../store/cartStore";
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const product = products.find((p) => p.id === id);
-  if (!product) return notFound();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(product.likes);
-
+  const [likes, setLikes] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const cartItems = useCartStore((state) => state.items);
+  const addItem = useCartStore((state) => state.addItem);
+  const removeItem = useCartStore((state) => state.removeItem);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const productData = await fetchProductByIdFromFirestore(id);
+        
+        if (!productData) {
+          setError('Product not found');
+        } else {
+          setProduct(productData);
+          setLikes(productData.likes);
+        }
+      } catch (err) {
+        console.error('Error loading product:', err);
+        setError('Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-md mx-auto bg-white min-h-screen relative">
+        <Navbar />
+        <div className="flex items-center justify-center h-64 pt-20">
+          <div className="text-gray-500">Loading product...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return notFound();
+  }
 
   const getTruncatedDescription = (desc: string) => {
     const words = desc.split(" ");
@@ -24,12 +70,18 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
     return words.slice(0, 30).join(" ") + "...";
   };
 
-  const cartItems = useCartStore((state) => state.items);
-  const addItem = useCartStore((state) => state.addItem);
-  const removeItem = useCartStore((state) => state.removeItem);
-
   // Check if this product is in the cart
   const isInCart = cartItems.some((item) => item.id === product.id);
+
+  // Helper function to format age range
+  const formatAgeRange = (ageRange: { start_age: number; end_age: number }) => {
+    return `${ageRange.start_age} - ${ageRange.end_age} years`;
+  };
+
+  // Helper function to format cleaning status
+  const formatCleaningStatus = (cleaningStatus: string) => {
+    return cleaningStatus.charAt(0).toUpperCase() + cleaningStatus.slice(1);
+  };
 
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative">
@@ -122,7 +174,7 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                     Age Range
                   </div>
                   <div className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
-                    {product.ageRange}
+                    {formatAgeRange(product.ageRange)}
                   </div>
                 </div>
                 <div>
@@ -130,16 +182,9 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                     Cleaning Status
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {product.cleaningStatus.washed && (
-                      <span className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
-                        Washed
-                      </span>
-                    )}
-                    {product.cleaningStatus.sanitised && (
-                      <span className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
-                        Sanitised
-                      </span>
-                    )}
+                    <span className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                      {formatCleaningStatus(product.cleaningStatus)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -158,8 +203,18 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
             <h3 className="text-lg font-bold mb-2">About this seller</h3>
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">📦</span>
+                <div className="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center overflow-hidden">
+                  {product.seller.avatar ? (
+                    <Image
+                      src={product.seller.avatar}
+                      alt={product.seller.name}
+                      width={40}
+                      height={40}
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="text-white font-bold">📦</span>
+                  )}
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">
@@ -168,7 +223,7 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                   <div className="flex items-center space-x-1">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <span className="text-sm text-gray-600">
-                      {product.seller.rating} · {product.seller.reviews} reviews
+                      {product.seller.rating} · {product.seller.review} reviews
                     </span>
                   </div>
                 </div>
