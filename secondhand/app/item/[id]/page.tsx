@@ -1,24 +1,32 @@
+"use client";
+
 import { notFound } from "next/navigation";
 import { products } from "../../data/products";
 import Image from "next/image";
-import { Heart, ShoppingCart, MessageCircle, Star, MapPin } from "lucide-react";
+import { ShoppingCart, Star, MapPin } from "lucide-react";
 import Navbar from "../../components/Navbar";
+import { useState } from "react";
 
-export default async function ItemDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = await Promise.resolve(params);
+export default function ItemDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const product = products.find((p) => p.id === id);
   if (!product) return notFound();
+
+  const [likes, setLikes] = useState(product.likes);
+
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const getTruncatedDescription = (desc: string) => {
+    const words = desc.split(" ");
+    if (words.length <= 30) return desc;
+    return words.slice(0, 30).join(" ") + "...";
+  };
 
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen">
       <Navbar />
-      <div className="pt-[640px] pb-24">
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          {/* Product Image and Shipping Info */}
+      <div className="pt-[550px] pb-20">
+        <div className="bg-white shadow-sm overflow-hidden">
           <div
             className="relative w-full overflow-hidden"
             style={{ aspectRatio: "402 / 402" }}
@@ -32,62 +40,95 @@ export default async function ItemDetailPage({
           </div>
         </div>
         {/* Product Title and Price */}
-        <div className="px-4 pt-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">
+        <div className="px-4 py-4">
+          <h2 className="font-wix text-lg font-semibold mb-1">
             {product.name}
           </h2>
-          <p className="text-2xl font-bold text-gray-900 mb-2">
-            ${product.price.toFixed(2)}
-          </p>
+          <p className="font-wix text-lg">${product.price.toFixed(2)}</p>
         </div>
         {/* Description */}
         <div className="px-4 mb-4">
-          <h3 className="text-lg font-bold mb-1">Description</h3>
-          <p className="text-gray-700 leading-relaxed">
-            {product.description}{" "}
-            <span className="text-red-500 cursor-pointer">Read More</span>
+          <h3 className="font-wix text-[16px] font-bold mb-1">Description</h3>
+          <p className="font-wix text-[16px]">
+            {showFullDescription ? (
+              product.description
+            ) : (
+              <>
+                <span>{getTruncatedDescription(product.description)}</span>
+                <span
+                  className="font-wix font-semibold text-brown cursor-pointer inline"
+                  style={{ whiteSpace: "nowrap" }}
+                  onClick={() => setShowFullDescription(true)}
+                >
+                  {" "}
+                  Read More
+                </span>
+              </>
+            )}
           </p>
         </div>
         {/* More Details, Deal Method, About Seller */}
         <div className="px-4">
           {/* More Details */}
           <div className="mb-6">
-            <h3 className="text-lg font-bold mb-2">More Details</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Condition</span>
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">
-                  {product.condition}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Age Range</span>
-                <span className="text-gray-900">{product.ageRange}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Brand</span>
-                <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                  {product.brand}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Cleaning Status</span>
-                <div className="flex space-x-2">
-                  {product.cleaningStatus.washed && (
-                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                      Washed
-                    </span>
-                  )}
-                  {product.cleaningStatus.sanitised && (
-                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                      Sanitised
-                    </span>
-                  )}
+            <h3 className="font-wix text-[16px] font-bold text-black">
+              More Details
+            </h3>
+            <div className="grid grid-cols-2 gap-x-5 gap-y-8">
+              {/* Left Column */}
+              <div className="space-y-3">
+                <div>
+                  <div className="font-wix text-[16px] text-brown mb-1">
+                    Condition
+                  </div>
+                  <div className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                    {product.condition}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-wix text-[16px] text-brown mb-1">
+                    Brand
+                  </div>
+                  <div className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                    {product.brand}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-wix text-[16px] text-brown mb-1">
+                    Size/Dimensions
+                  </div>
+                  <div className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                    {product.dimensions}
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Size/Dimensions</span>
-                <span className="text-gray-900">{product.dimensions}</span>
+              {/* Right Column */}
+              <div className="space-y-3">
+                <div>
+                  <div className="font-wix text-md text-brown mb-1">
+                    Age Range
+                  </div>
+                  <div className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                    {product.ageRange}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-wix text-md text-brown mb-1">
+                    Cleaning Status
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {product.cleaningStatus.washed && (
+                      <span className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                        Washed
+                      </span>
+                    )}
+                    {product.cleaningStatus.sanitised && (
+                      <span className="inline-block bg-[#FFEFE3] text-brown px-3 py-1.5 rounded-full text-xs font-wix font-normal">
+                        Sanitised
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -135,9 +176,12 @@ export default async function ItemDetailPage({
       {/* Bottom Actions */}
       <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-white border-t border-gray-200 p-4 z-50">
         <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-1 text-gray-600 bg-gray-50 px-4 py-3 rounded-lg">
-            <Heart className="w-5 h-5" />
-            <span>{product?.likes}</span>
+          <button
+            className="flex items-center space-x-1 text-gray-600 px-4 py-3 rounded-lg"
+            onClick={() => setLikes(likes + 1)}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <span>{likes}</span>
           </button>
           <button className="font-wix flex-1 bg-brown text-white py-3 px-6 rounded-lg">
             Make Offer

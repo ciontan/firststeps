@@ -15,7 +15,7 @@ export default function OnchainStoreItem({ id, name, price, image }: Product) {
         />
       </div>
       <div className="flex flex-col px-4 py-3 grow">
-        <h2 className="font-wix mb-2 line-clamp-2">{name}</h2>
+        <h2 className="font-wix text-sm mb-2 line-clamp-2">{name}</h2>
         <div className="flex items-center justify-between mb-2">
           <p className="font-wix font-bold text-auto text-gray-900">
             ${price.toFixed(2)}

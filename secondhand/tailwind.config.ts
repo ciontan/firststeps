@@ -8,8 +8,8 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily:{
-        wix: ["Wix Madefor Text", "sans-serif"],
+      fontFamily: {
+        wix: ["'Wix Madefor Text'", "sans-serif"],
       },
       colors: {
         background: "var(--background)",
