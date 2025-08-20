@@ -2,7 +2,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { OnchainStoreContextType } from "../types";
 import type { Product } from "../types";
-import { fetchProductsFromFirestore } from "../services/firebaseService";
+import {
+  fetchProductsFromFirestore,
+  searchProducts,
+  filterProductsByCategory,
+} from "../services/firebaseService";
 
 const emptyContext = {} as OnchainStoreContextType;
 
@@ -14,10 +18,13 @@ type OnchainStoreProviderReact = {
 };
 
 export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // Fetch products from Firestore on component mount
   useEffect(() => {
@@ -25,7 +32,8 @@ export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
       try {
         setLoading(true);
         const firestoreProducts = await fetchProductsFromFirestore();
-        setProducts(firestoreProducts);
+        setAllProducts(firestoreProducts);
+        setFilteredProducts(firestoreProducts);
       } catch (error) {
         console.error("Failed to load products:", error);
       } finally {
@@ -36,6 +44,27 @@ export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
     loadProducts();
   }, []);
 
+  // Apply search and category filters
+  useEffect(() => {
+    let results = [...allProducts];
+
+    // Apply category filter first
+    results = filterProductsByCategory(results, selectedCategory);
+
+    // Then apply search filter
+    results = searchProducts(results, searchQuery);
+
+    setFilteredProducts(results);
+  }, [allProducts, searchQuery, selectedCategory]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+  };
+
   const isInCart = useMemo(
     () => (productId: string) => Boolean(cart[productId]),
     [cart],
@@ -58,18 +87,18 @@ export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
   const amount = useMemo(() => {
     let total = 0;
     for (const [productId, quantity] of Object.entries(cart)) {
-      const product = products.find((p) => p.id === productId);
+      const product = allProducts.find((p) => p.id === productId);
       if (product) {
         total += product.price * quantity;
       }
     }
     return total;
-  }, [cart, products]);
+  }, [cart, allProducts]);
 
   return (
     <OnchainStoreContext.Provider
       value={{
-        products,
+        products: filteredProducts,
         quantities: cart,
         isOpen,
         setIsOpen,
@@ -78,6 +107,10 @@ export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
         removeFromCart,
         amount,
         loading,
+        searchQuery,
+        onSearch: handleSearch,
+        selectedCategory,
+        onCategoryChange: handleCategoryChange,
       }}
     >
       {children}
@@ -89,81 +122,3 @@ export default function useOnchainStoreContext() {
   const context = useContext(OnchainStoreContext);
   return context;
 }
-
-/*import { createContext, useContext, useMemo, useState } from "react";
-import type { ReactNode } from "react";
-import type { OnchainStoreContextType } from "../types";
-import type { Product } from "../types";
-import { products } from "../data/products";
-
-const emptyContext = {} as OnchainStoreContextType;
-
-const OnchainStoreContext =
-  createContext<OnchainStoreContextType>(emptyContext);
-
-type OnchainStoreProviderReact = {
-  children: ReactNode;
-};
-
-export function OnchainStoreProvider({ children }: OnchainStoreProviderReact) {
-  const [cart, setCart] = useState<Record<string, number>>({});
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const isInCart = useMemo(
-    () => (productId: string) => Boolean(cart[productId]),
-    [cart],
-  );
-
-  const addToCart = (productId: string) => {
-    setCart((c) => ({
-      ...c,
-      [productId]: (c[productId] || 0) + 1,
-    }));
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((c) => {
-      const { [productId]: _, ...rest } = c;
-      return rest;
-    });
-  };
-
-  const amount = useMemo(() => {
-    let total = 0;
-    for (const [productId, quantity] of Object.entries(cart)) {
-      const product = products.find((p) => p.id === productId);
-      if (product) {
-        total += product.price * quantity;
-      }
-    }
-    return total;
-  }, [cart]);
-
-  return (
-    <OnchainStoreContext.Provider
-      value={{
-        products,
-        quantities: cart,
-        isOpen,
-        setIsOpen,
-        isInCart,
-        addToCart,
-        removeFromCart,
-        amount,
-      }}
-    >
-      {children}
-    </OnchainStoreContext.Provider>
-  );
-}
-
-export default function useOnchainStoreContext() {
-  const context = useContext(OnchainStoreContext);
-
-  if (!context) {
-    throw new Error("Please wrap your app with OnchainStoreProvider");
-  }
-
-  return context;
-}
-*/

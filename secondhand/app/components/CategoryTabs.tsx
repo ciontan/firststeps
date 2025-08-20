@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BabyEssentials from "../svg/Categories/Essentials";
 import Clothes from "../svg/Categories/Clothes";
 import Toys from "../svg/Categories/Toys";
@@ -6,6 +6,7 @@ import Furniture from "../svg/Categories/Furniture";
 import Learning from "../svg/Categories/Learning";
 import Sports from "../svg/Categories/Sports";
 import All from "../svg/Categories/All";
+import useOnchainStoreContext from "./OnchainStoreProvider";
 
 const categories = [
   { id: "all", name: "All", icon: All },
@@ -24,10 +25,22 @@ interface CategoryTabsProps {
 }
 
 const CategoryTabs: React.FC<CategoryTabsProps> = ({ onCategoryChange }) => {
-  const [activeCategory, setActiveCategory] = useState<CategoryType>("all");
+  const { selectedCategory, onCategoryChange: contextCategoryChange } =
+    useOnchainStoreContext();
+  const [activeCategory, setActiveCategory] = useState<CategoryType>(
+    (selectedCategory as CategoryType) || "all",
+  );
+
+  // Update local state when context changes
+  useEffect(() => {
+    setActiveCategory((selectedCategory as CategoryType) || "all");
+  }, [selectedCategory]);
 
   const handleCategoryClick = (categoryId: CategoryType) => {
     setActiveCategory(categoryId);
+    // Use the context function to update the global state
+    contextCategoryChange(categoryId);
+    // Also call the prop function if provided (for backward compatibility)
     onCategoryChange?.(categoryId);
   };
 

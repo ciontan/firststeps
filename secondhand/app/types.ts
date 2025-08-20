@@ -45,7 +45,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  image: string | StaticImageData
+  image: string | StaticImageData;
   description: string;
   condition: Condition;
   ageRange: AgeRange;
@@ -55,7 +55,7 @@ export interface Product {
   dealMethod: string;
   seller: Seller;
   likes: number;
-  category: Category;
+  category: string; // Changed to string to match Firestore data
   status: string;
 }
 
@@ -98,12 +98,14 @@ export interface OnchainStoreContextType {
   products: Product[];
   quantities: Record<string, number>;
   isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
+  setIsOpen: (value: boolean) => void;
   isInCart: (productId: string) => boolean;
   addToCart: (productId: string) => void;
   removeFromCart: (productId: string) => void;
   amount: number;
-  loading: boolean;
+  loading?: boolean;
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
 }
-
-

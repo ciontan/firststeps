@@ -63,8 +63,8 @@ export default function Navbar({
                     <div
                       className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                       style={{
-                        top: "-6px",
-                        right: "-3px",
+                        top: "2px",
+                        right: "5px",
                         transform: "translate(50%,-50%)",
                         zIndex: 1,
                       }}
