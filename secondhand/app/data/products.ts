@@ -83,4 +83,25 @@ export const products = [
     },
     likes: 3,
   },
+    {
+    id: "5",
+    name: "OCK Black Mug - Ceramic Coffee Cup",
+    price: 9.99,
+    image: "/images/mug.png",
+    description:
+      "Beautiful ceramic mug in pristine condition. Perfect size for your morning coffee or tea. Heat-resistant and dishwasher safe. Classic black design fits any kitchen aesthetic.",
+    condition: "Excellent",
+    ageRange: "All ages",
+    brand: "OCK",
+    cleaningStatus: { washed: true, sanitised: true },
+    dimensions: "12cm x 9cm x 8cm",
+    dealMethod: "Meet up: Tampines Mall",
+    seller: {
+      name: "coffeelover",
+      rating: 4.7,
+      reviews: 15,
+      avatar: "/images/seller-avatar4.png",
+    },
+    likes: 3,
+  },
 ];
