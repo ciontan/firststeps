@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import type { OnchainStoreContextType } from "../types";
-import type { Product } from "../types";
+import type { OnchainStoreContextType } from "../types.ts";
+import type { Product } from "../types.ts";
 import {
   fetchProductsFromFirestore,
   searchProducts,
   filterProductsByCategory,
-} from "../services/firebaseService";
+} from "../services/firebaseService.jsx";
 
 const emptyContext = {} as OnchainStoreContextType;
 

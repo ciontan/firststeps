@@ -1,7 +1,8 @@
-import { COINBASE_COMMERCE_API_KEY } from "../../config.js";
-import { COMMERCE_API_URL } from "../../links";
+import { COMMERCE_API_URL } from "../../links.js";
 import { NextResponse } from "next/server";
-import type { ChargeDetails } from "../../types";
+import type { ChargeDetails } from "../../types.js";
+
+const COINBASE_COMMERCE_API_KEY = process.env.COINBASE_COMMERCE_API_KEY;
 
 export async function POST(request: Request) {
   if (!COINBASE_COMMERCE_API_KEY) {
