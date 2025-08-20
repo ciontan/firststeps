@@ -6,12 +6,58 @@ export type NavbarLinkReact = {
   label: string;
 };
 
-export type Product = {
+export enum CleaningStatus {
+  Washed = "washed",
+  Sanitised = "sanitised",
+}
+
+export enum Condition {
+  BrandNew = "brand new",
+  LikeNew = "like new",
+  LightlyUsed = "lightly used",
+  WellUsed = "well used",
+  HeavilyUsed = "heavily used",
+}
+
+export interface AgeRange {
+  start_age: number;
+  end_age: number;
+}
+
+export enum Category {
+  BabyEssentials = "Baby essentials",
+  Clothes = "Clothes",
+  Toys = "Toys",
+  Furniture = "Furniture",
+  Learning = "Learning",
+  Sports = "Sports",
+}
+
+export interface Seller {
+  name: string;
+  rating: number;
+  review: number;
+  avatar: string;
+  listings: Product[];
+}
+
+export interface Product {
   id: string;
   name: string;
   price: number;
   image: string | StaticImageData;
-};
+  description: string;
+  condition: Condition;
+  ageRange: AgeRange;
+  brand: string;
+  cleaningStatus: CleaningStatus;
+  dimensions: string;
+  dealMethod: string;
+  seller: Seller;
+  likes: number;
+  category: string; // Changed to string to match Firestore data
+  status: string;
+}
 
 export type Quantities = Record<string, number>;
 
@@ -48,7 +94,7 @@ export type ChargeDetails = {
   };
 };
 
-export type OnchainStoreContextType = {
+export interface OnchainStoreContextType {
   products: Product[];
   quantities: Record<string, number>;
   isOpen: boolean;
@@ -57,4 +103,9 @@ export type OnchainStoreContextType = {
   addToCart: (productId: string) => void;
   removeFromCart: (productId: string) => void;
   amount: number;
-};
+  loading?: boolean;
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
+}
