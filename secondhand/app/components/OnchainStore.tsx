@@ -5,7 +5,6 @@ import CategoryTabs from "./CategoryTabs";
 import OnchainStoreCart from "./OnchainStoreCart";
 import OnchainStoreItems from "./OnchainStoreItems";
 import { OnchainStoreProvider } from "./OnchainStoreProvider";
-import OnchainStoreSummary from "./OnchainStoreSummary";
 import SearchBar from "./SearchBar";
 import useOnchainStoreContext from "./OnchainStoreProvider";
 
