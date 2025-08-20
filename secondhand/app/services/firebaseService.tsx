@@ -1,7 +1,7 @@
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import type { Product } from "../types";
-import { CleaningStatus, Condition, Category } from "../types";
+import { CleaningStatus, Condition } from "../types";
 
 export async function fetchProductsFromFirestore(): Promise<Product[]> {
   try {
@@ -36,7 +36,7 @@ export async function fetchProductsFromFirestore(): Promise<Product[]> {
           listings: data.seller?.listings || [],
         },
         likes: data.likes || 0,
-        category: (data.category as Category) || Category.BabyEssentials,
+        category: data.category || "Baby essentials", // Keep as string from Firestore
         status: data.status || "pending", // <-- Added status field
       };
 
@@ -88,7 +88,7 @@ export async function fetchProductByIdFromFirestore(
         listings: data.seller?.listings || [],
       },
       likes: data.likes || 0,
-      category: (data.category as Category) || Category.BabyEssentials,
+      category: data.category || "Baby essentials", // Keep as string from Firestore
       status: data.status || "pending", // <-- Added status field
     };
 
@@ -97,4 +97,62 @@ export async function fetchProductByIdFromFirestore(
     console.error("Error fetching product from Firestore:", error);
     return null;
   }
+}
+
+export function searchProducts(products: Product[], query: string): Product[] {
+  if (!query.trim()) {
+    return products;
+  }
+
+  const searchTerm = query.toLowerCase().trim();
+
+  return products.filter((product) => {
+    // Search by product name
+    const nameMatch = product.name.toLowerCase().includes(searchTerm);
+
+    // Search by category
+    const categoryMatch = product.category.toLowerCase().includes(searchTerm);
+
+    // Search by brand
+    const brandMatch = product.brand.toLowerCase().includes(searchTerm);
+
+    // Search by description (optional for more comprehensive search)
+    const descriptionMatch = product.description
+      .toLowerCase()
+      .includes(searchTerm);
+
+    return nameMatch || categoryMatch || brandMatch || descriptionMatch;
+  });
+}
+
+export function filterProductsByCategory(
+  products: Product[],
+  category: string,
+): Product[] {
+  if (category === "all" || !category) {
+    return products;
+  }
+
+  // Map category IDs from CategoryTabs to actual Firestore category values
+  const categoryMap: Record<string, string> = {
+    baby: "Baby essentials",
+    clothes: "Clothes",
+    toys: "Toys",
+    furniture: "Furniture",
+    learning: "Learning",
+    sports: "Sports",
+  };
+
+  const targetCategoryString = categoryMap[category.toLowerCase()];
+
+  if (!targetCategoryString) {
+    return products;
+  }
+
+  return products.filter((product) => {
+    // Case-insensitive comparison to handle any potential casing differences
+    return (
+      product.category.toLowerCase() === targetCategoryString.toLowerCase()
+    );
+  });
 }

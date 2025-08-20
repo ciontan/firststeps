@@ -39,7 +39,13 @@ export const useCartStore = create<CartStore>((set) => ({
         return {
           items: [
             ...state.items,
-            { ...product, quantity: 1, status: "pending" },
+            {
+              ...product,
+              quantity: 1,
+              status:
+                (product.status as "successful" | "pending" | "rejected") ||
+                "pending",
+            },
           ],
         };
       });
