@@ -1,5 +1,5 @@
-import { GITHUB_LINK, ONCHAINKIT_LINK } from '../links';
-import { ExternalLinkSvg } from '../svg/ExternalLinkSvg';
+import { GITHUB_LINK, ONCHAINKIT_LINK } from "../links";
+import { ExternalLinkSvg } from "../svg/ExternalLinkSvg";
 
 export default function OnchainStoreSummary() {
   return (
@@ -10,7 +10,7 @@ export default function OnchainStoreSummary() {
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 700,
-            fontStretch: 'condensed',
+            fontStretch: "condensed",
           }}
         >
           The future of commerce is less fee. More creativity.
@@ -18,10 +18,10 @@ export default function OnchainStoreSummary() {
         <p className="text-sm leading-relaxed">
           People and businesses lose tens of billions of dollars in transaction
           fees and countless hours in delays to the current system that they
-          wouldn't with onchain payments.
+          wouldn&apos;t with onchain payments.
         </p>
         <p className="text-sm leading-relaxed">
-          We're updating the system so it's cheaper and faster.
+          We&apos;re updating the system so it&apos;s cheaper and faster.
         </p>
         <div className="flex flex-col pt-6">
           <p className="pt-2 pb-2 font-bold text-sm leading-relaxed">
