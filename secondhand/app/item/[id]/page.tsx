@@ -26,21 +26,21 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const loadProduct = async () => {
       if (!id) return;
-      
+
       try {
         setLoading(true);
         setError(null);
         const productData = await fetchProductByIdFromFirestore(id);
-        
+
         if (!productData) {
-          setError('Product not found');
+          setError("Product not found");
         } else {
           setProduct(productData);
           setLikes(productData.likes);
         }
       } catch (err) {
-        console.error('Error loading product:', err);
-        setError('Failed to load product');
+        console.error("Error loading product:", err);
+        setError("Failed to load product");
       } finally {
         setLoading(false);
       }
