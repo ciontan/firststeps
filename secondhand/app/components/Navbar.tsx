@@ -10,6 +10,7 @@ import { Successful } from "../svg/Successful";
 import { Pending } from "../svg/Pending";
 import { Rejected } from "../svg/Rejected";
 import { Listing } from "../svg/Listing";
+import Link from "next/link";
 import All from "../svg/Categories/All";
 
 export default function Navbar() {
@@ -50,6 +51,7 @@ export default function Navbar() {
               <Logo />
             </div>
             <div className="flex items-center relative">
+              <Link href= "/cart">
               <div className="relative">
                 <ShoppingCart className="text-brown" />
                 {cartItems.length > 0 && (
@@ -66,6 +68,7 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
+              </Link>
             </div>
           </div>
         </div>
