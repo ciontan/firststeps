@@ -3,15 +3,17 @@
 import { notFound } from "next/navigation";
 import { products } from "../../data/products";
 import Image from "next/image";
-import { ShoppingCart, Star, MapPin } from "lucide-react";
+import { ShoppingCart, Star, MapPin, Check } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import { useState } from "react";
+import { useCartStore } from "../../store/cartStore";
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const product = products.find((p) => p.id === id);
   if (!product) return notFound();
 
+  const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(product.likes);
 
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -21,6 +23,13 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
     if (words.length <= 30) return desc;
     return words.slice(0, 30).join(" ") + "...";
   };
+
+  const cartItems = useCartStore((state) => state.items);
+  const addItem = useCartStore((state) => state.addItem);
+  const removeItem = useCartStore((state) => state.removeItem);
+
+  // Check if this product is in the cart
+  const isInCart = cartItems.some((item) => item.id === product.id);
 
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative">
@@ -176,22 +185,61 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
           </div>
         </div>
       </div>
-
       {/* Bottom Actions */}
       <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-white border-t border-gray-200 p-4 z-[60]">
         <div className="flex items-center space-x-3">
           <button
-            className="flex items-center space-x-1 text-gray-600 px-4 py-3 rounded-lg"
-            onClick={() => setLikes(likes + 1)}
+            className={`flex items-center space-x-1 px-4 py-3 rounded-lg ${liked ? "text-brown" : "text-gray-600"}`}
+            onClick={() => {
+              if (!liked) {
+                setLikes(likes + 1);
+                setLiked(true);
+              } else {
+                setLikes(likes - 1);
+                setLiked(false);
+              }
+            }}
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart
+              className="w-5 h-5"
+              fill={liked ? "#601816" : "none"}
+            />
             <span>{likes}</span>
           </button>
-          <button className="font-wix flex-1 bg-brown text-white py-3 px-6 rounded-lg">
-            Make Offer
-          </button>
-          <button className="font-wix flex-1 bg-brown text-white py-3 px-6 rounded-lg">
-            Chat
+          {isInCart ? (
+            <button
+              onClick={() => {
+                removeItem(product.id);
+                console.log("Item removed from cart:", product.id);
+              }}
+              className="font-wix flex-1 bg-[#fdefe4] text-brown py-3 px-6 rounded-lg flex items-center justify-center space-x-2"
+            >
+              <Check className="w-5 h-5 mr-2" />
+              <span>In Cart</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                addItem({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image,
+                });
+                const cartItems = useCartStore.getState().items;
+                console.log("Item added to cart:", cartItems);
+              }}
+              className="font-wix flex-1 bg-brown text-white py-3 px-6 rounded-lg"
+            >
+              Make Offer
+            </button>
+          )}
+          <button
+            className="font-wix flex-1 bg-gray-400 text-white py-1 px-6 rounded-lg flex flex-col items-center justify-center"
+            disabled
+          >
+            <span>Chat</span>
+            <span className="text-[11px] text-white/70">Working on it</span>
           </button>
         </div>
       </div>

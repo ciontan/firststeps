@@ -3,6 +3,7 @@ import { useState } from "react";
 import Logo from "../svg/Logo";
 import { ShoppingCart, Menu, ChevronDown, ChevronUp } from "lucide-react";
 import { About } from "../svg/About";
+import { useCartStore } from "../store/cartStore";
 import { Vision } from "../svg/Vision";
 import { Values } from "../svg/Values";
 import { Successful } from "../svg/Successful";
@@ -13,6 +14,7 @@ import All from "../svg/Categories/All";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const cartItems = useCartStore((state) => state.items);
 
   // Section expand/collapse state
   const [profileOpen, setProfileOpen] = useState(true);
@@ -47,8 +49,23 @@ export default function Navbar() {
             <div className="flex items-center">
               <Logo />
             </div>
-            <div className="flex items-center">
-              <ShoppingCart className="text-brown" />
+            <div className="flex items-center relative">
+              <div className="relative">
+                <ShoppingCart className="text-brown" />
+                {cartItems.length > 0 && (
+                  <div
+                    className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    style={{
+                      top: "-6px",
+                      right: "-3px",
+                      transform: "translate(50%,-50%)",
+                      zIndex: 1,
+                    }}
+                  >
+                    {cartItems.length}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
