@@ -23,8 +23,12 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen">
+    <div className="max-w-md mx-auto bg-white min-h-screen relative">
       <Navbar />
+      {typeof window !== "undefined" &&
+        document.querySelector(
+          ".fixed.inset-0.bg-black.bg-opacity-50.z-50",
+        ) && <div className="fixed inset-0 z-[60] bg-black bg-opacity-50" />}
       <div className="pt-[550px] pb-20">
         <div className="bg-white shadow-sm overflow-hidden">
           <div
@@ -174,7 +178,7 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
       </div>
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-white border-t border-gray-200 p-4 z-50">
+      <div className="fixed bottom-0 left-0 w-full max-w-md mx-auto bg-white border-t border-gray-200 p-4 z-[60]">
         <div className="flex items-center space-x-3">
           <button
             className="flex items-center space-x-1 text-gray-600 px-4 py-3 rounded-lg"
