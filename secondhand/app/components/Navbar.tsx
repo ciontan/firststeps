@@ -12,8 +12,13 @@ import { Rejected } from "../svg/Rejected";
 import { Listing } from "../svg/Listing";
 import Link from "next/link";
 import All from "../svg/Categories/All";
+import React from "react";
 
-export default function Navbar() {
+export default function Navbar({
+  centerContent,
+}: {
+  centerContent?: React.ReactNode;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const cartItems = useCartStore((state) => state.items);
 
@@ -36,38 +41,38 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 z-[55] w-full bg-white border-b border-gray-200">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+      <nav className="fixed top-0 left-0 right-0 z-[55] w-full bg-white border-b border-gray-200 h-16">
+        <div className="px-2 sm:px-4 md:px-6 lg:px-8 h-full">
+          <div className="flex justify-between h-full w-full items-center">
             <div className="flex items-center">
               <button
                 onClick={() => setIsOpen(true)}
-                className="inline-flex items-center justify-center rounded-md text-brown hover:text-brown hover:bg-[#FFEFE3] focus:outline-none"
+                className="inline-flex items-center justify-center p-2 rounded-md text-brown hover:text-brown hover:bg-[#FFEFE3] focus:outline-none"
               >
                 <Menu className="block h-6 w-6 text-brown" />
               </button>
             </div>
             <div className="flex items-center">
-              <Logo />
+              {centerContent ? centerContent : <Logo />}
             </div>
             <div className="flex items-center relative">
-              <Link href= "/cart">
-              <div className="relative">
-                <ShoppingCart className="text-brown" />
-                {cartItems.length > 0 && (
-                  <div
-                    className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                    style={{
-                      top: "-6px",
-                      right: "-3px",
-                      transform: "translate(50%,-50%)",
-                      zIndex: 1,
-                    }}
-                  >
-                    {cartItems.length}
-                  </div>
-                )}
-              </div>
+              <Link href="/cart">
+                <div className="relative">
+                  <ShoppingCart className="text-brown" />
+                  {cartItems.length > 0 && (
+                    <div
+                      className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      style={{
+                        top: "-6px",
+                        right: "-3px",
+                        transform: "translate(50%,-50%)",
+                        zIndex: 1,
+                      }}
+                    >
+                      {cartItems.length}
+                    </div>
+                  )}
+                </div>
               </Link>
             </div>
           </div>
@@ -84,7 +89,7 @@ export default function Navbar() {
 
       {/* Side Navigation Panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-[70] ${
+        className={`fixed top-0 left-0 h-full w-4/5 max-w-xs sm:max-w-sm md:max-w-md lg:w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-[70] ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

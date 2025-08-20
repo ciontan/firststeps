@@ -56,6 +56,7 @@ export interface Product {
   seller: Seller;
   likes: number;
   category: Category;
+  status: string;
 }
 
 export type Quantities = Record<string, number>;

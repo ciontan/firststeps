@@ -13,7 +13,7 @@ export async function fetchProductsFromFirestore(): Promise<Product[]> {
 
       // Map Firestore data to your Product type
       const product: Product = {
-        id: doc.id, // Firestore document ID as string
+        id: doc.id,
         name: data.name || "",
         price: data.price || 0,
         image: data.image || "",
@@ -25,7 +25,7 @@ export async function fetchProductsFromFirestore(): Promise<Product[]> {
         },
         brand: data.brand || "",
         cleaningStatus:
-          (data.cleaningStatus as CleaningStatus) || CleaningStatus.Washed, // Cast string to enum
+          (data.cleaningStatus as CleaningStatus) || CleaningStatus.Washed,
         dimensions: data.dimensions || "",
         dealMethod: data.dealMethod || "",
         seller: {
@@ -37,6 +37,7 @@ export async function fetchProductsFromFirestore(): Promise<Product[]> {
         },
         likes: data.likes || 0,
         category: (data.category as Category) || Category.BabyEssentials,
+        status: data.status || "pending", // <-- Added status field
       };
 
       products.push(product);
@@ -87,7 +88,8 @@ export async function fetchProductByIdFromFirestore(
         listings: data.seller?.listings || [],
       },
       likes: data.likes || 0,
-      category: (data.seller?.category as Category) || Category.BabyEssentials,
+      category: (data.category as Category) || Category.BabyEssentials,
+      status: data.status || "pending", // <-- Added status field
     };
 
     return product;
