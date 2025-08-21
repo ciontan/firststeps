@@ -48,11 +48,8 @@ const STATUS_LABELS = {
   pending: "Pending",
 };
 
-interface ListingsPageProps {
-  onCategorySelect?: (category: CategoryType) => void;
-}
 
-export default function ListingsPage({ onCategorySelect }: ListingsPageProps) {
+export default function ListingsPage() {
   const [listings, setListings] = useState<UserListing[]>([]);
   const [activeTab, setActiveTab] = useState<
     "all" | "active" | "sold" | "draft" | "pending"
@@ -84,6 +81,9 @@ export default function ListingsPage({ onCategorySelect }: ListingsPageProps) {
     console.log("Edit listing:", id);
   };
 
+    function onCategorySelect(category: CategoryType): void {
+        console.log("Selected category:", category);
+    }
   return (
     <div className="min-h-screen bg-white">
       <Navbar
