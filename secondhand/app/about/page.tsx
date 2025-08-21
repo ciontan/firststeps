@@ -51,11 +51,10 @@ export default function AboutPage() {
                       pre-loved baby essentials at affordable prices.
                     </p>
                     <p className="text-gray-700 leading-relaxed">
-                      Founded by parents, for parents, we believe that every
-                      family deserves access to safe, high-quality baby products
-                      without breaking the bank. Our platform connects caring
-                      families, creating a community where sustainability meets
-                      affordability.
+                      We believe that every family deserves access to
+                      high-quality baby products without breaking the bank. Our
+                      platform connects caring families, creating a community
+                      where sustainability meets affordability.
                     </p>
                   </div>
                 </div>
@@ -79,16 +78,16 @@ export default function AboutPage() {
                     <p className="text-gray-700 leading-relaxed mb-4">
                       We envision a world where every parent has access to
                       quality baby products regardless of their budget. By
-                      promoting the reuse of baby items, we&#39;re building a more
-                      sustainable future for our children while supporting
+                      promoting the reuse of baby items, we&#39;re building a
+                      more sustainable future for our children while supporting
                       families in their parenting journey.
                     </p>
                     <p className="text-gray-700 leading-relaxed">
                       Our goal is to become the go-to platform for conscious
                       parents who want to make smart, eco-friendly choices
-                      without compromising on quality or safety. Together, we&#39;re
-                      creating a circular economy that benefits families and the
-                      planet.
+                      without compromising on quality or safety. Together,
+                      we&#39;re creating a circular economy that benefits
+                      families and the planet.
                     </p>
                   </div>
                 </div>
@@ -111,16 +110,6 @@ export default function AboutPage() {
                       Our Values
                     </h2>
                     <div className="grid gap-6 md:grid-cols-2">
-                      <div className="space-y-3">
-                        <h3 className="font-semibold text-brown">
-                          Safety First
-                        </h3>
-                        <p className="text-sm text-gray-700 leading-relaxed">
-                          Every item is carefully vetted to ensure it meets
-                          safety standards and provides peace of mind for
-                          parents.
-                        </p>
-                      </div>
                       <div className="space-y-3">
                         <h3 className="font-semibold text-brown">
                           Sustainability
@@ -167,12 +156,18 @@ export default function AboutPage() {
                   own items to help other families.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors">
+                  <a
+                    href="/"
+                    className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors text-center"
+                  >
                     Start Shopping
-                  </button>
-                  <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                  </a>
+                  <a
+                    href="/listings"
+                    className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors text-center"
+                  >
                     Sell Your Items
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>

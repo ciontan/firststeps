@@ -193,21 +193,21 @@ export default function Navbar({
               <div className="space-y-2 ml-1">
                 <button
                   onClick={() => handleAboutNavigation('about-us')}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <About className="w-6 h-6" />
                   About us
                 </button>
                 <button
                   onClick={() => handleAboutNavigation('our-vision')}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Vision className="w-6 h-6" />
                   Our Vision
                 </button>
                 <button
                   onClick={() => handleAboutNavigation('our-values')}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Values className="w-6 h-6" />
                   Our Values
@@ -232,49 +232,49 @@ export default function Navbar({
               <div className="space-y-2 ml-1">
                 <button
                   onClick={() => handleCategorySelect("all")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <All className="w-6 h-6" />
                   All
                 </button>
                 <button
                   onClick={() => handleCategorySelect("baby")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Icons.Essentials className="w-6 h-6" />
                   Baby Essentials
                 </button>
                 <button
                   onClick={() => handleCategorySelect("clothes")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Icons.Clothes className="w-6 h-6" />
                   Clothes
                 </button>
                 <button
                   onClick={() => handleCategorySelect("toys")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Icons.Toys className="w-6 h-6" />
                   Toys
                 </button>
                 <button
                   onClick={() => handleCategorySelect("furniture")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Icons.Furniture className="w-6 h-6" />
                   Furniture
                 </button>
                 <button
                   onClick={() => handleCategorySelect("learning")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Icons.Learning className="w-6 h-6" />
                   Learning
                 </button>
                 <button
                   onClick={() => handleCategorySelect("sports")}
-                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Icons.Sports className="w-6 h-6" />
                   Sports
@@ -299,7 +299,7 @@ export default function Navbar({
               <div className="space-y-2 ml-1">
                 <button
                   onClick={() => router.push("/listings")}
-                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Listing className="w-6 h-6" />
                   Listings
@@ -322,15 +322,15 @@ export default function Navbar({
             </div>
             {cartOpen && (
               <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 text-md font-wix p-2">
+                <div className="flex items-center gap-2 text-md font-wix ">
                   <Successful className="w-6 h-6" />
                   Successful
                 </div>
-                <div className="flex items-center gap-2 text-md font-wix p-2">
+                <div className="flex items-center gap-2 text-md font-wix ">
                   <Pending className="w-6 h-6" />
                   Pending
                 </div>
-                <div className="flex items-center gap-2 text-md font-wix p-2">
+                <div className="flex items-center gap-2 text-md font-wix ">
                   <Rejected className="w-6 h-6" />
                   Rejected
                 </div>
