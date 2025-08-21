@@ -327,7 +327,7 @@ export default function Navbar({
                     setIsOpen(false);
                     router.push("/cart?tab=successful");
                   }}
-                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Successful className="w-6 h-6" />
                   Successful
@@ -337,7 +337,7 @@ export default function Navbar({
                     setIsOpen(false);
                     router.push("/cart?tab=pending");
                   }}
-                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Pending className="w-6 h-6" />
                   Pending
@@ -347,7 +347,7 @@ export default function Navbar({
                     setIsOpen(false);
                     router.push("/cart?tab=rejected");
                   }}
-                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Rejected className="w-6 h-6" />
                   Rejected
