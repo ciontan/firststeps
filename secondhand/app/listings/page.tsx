@@ -461,14 +461,16 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted with data:", formData);
 
     // Validate form
-    if (!validateForm()) {
+    const isValid = validateForm();
+    if (!isValid) {
+      console.log("Form validation failed");
       return;
     }
 
     setIsSubmitting(true);
-    console.log("Starting form submission...");
 
     try {
       let imageUrl = "";
@@ -476,15 +478,11 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
       // For now, skip Firebase Storage upload due to CORS issues in development
       // Use placeholder or base64 image instead
       if (imageFile) {
-        console.log(
-          "Image file selected, but skipping Firebase Storage upload due to CORS issues",
-        );
         // Use the preview URL for now (base64)
         imageUrl = imagePreview || "/api/placeholder/300/300";
       } else {
         // Use a placeholder image if no image is uploaded
         imageUrl = "/api/placeholder/300/300";
-        console.log("Using placeholder image");
       }
 
       // TODO: Once CORS is configured, uncomment the following lines:
@@ -521,10 +519,10 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
         status: "pending", // Default status for new listings
       };
 
-      console.log("Saving product to Firestore...", productData);
+      console.log("Saving product to Firestore...");
       // Save to Firebase
       const productId = await saveProductToFirestore(productData);
-      console.log("Product saved with ID:", productId);
+      console.log("Product saved successfully with ID:", productId);
 
       // Create local listing object for immediate UI update
       const newListing: UserListing = {
@@ -556,7 +554,7 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
         },
       };
 
-      console.log("Refreshing listings and closing modal...");
+      console.log("Listing created successfully, refreshing page...");
       await onAdd(newListing);
 
       // Reset form data
@@ -588,7 +586,6 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
         `Failed to create listing: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } finally {
-      console.log("Setting isSubmitting to false");
       setIsSubmitting(false);
     }
   };
@@ -745,12 +742,18 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
                 min="0"
                 required
                 value={formData.startAge}
-                onChange={(e) =>
-                  setFormData({ ...formData, startAge: e.target.value })
-                }
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+                onChange={(e) => {
+                  setFormData({ ...formData, startAge: e.target.value });
+                  if (errors.startAge) setErrors({ ...errors, startAge: "" });
+                }}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                  errors.startAge ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="0"
               />
+              {errors.startAge && (
+                <p className="text-red-500 text-xs mt-1">{errors.startAge}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -761,12 +764,18 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
                 min="0"
                 required
                 value={formData.endAge}
-                onChange={(e) =>
-                  setFormData({ ...formData, endAge: e.target.value })
-                }
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+                onChange={(e) => {
+                  setFormData({ ...formData, endAge: e.target.value });
+                  if (errors.endAge) setErrors({ ...errors, endAge: "" });
+                }}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                  errors.endAge ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="36"
               />
+              {errors.endAge && (
+                <p className="text-red-500 text-xs mt-1">{errors.endAge}</p>
+              )}
             </div>
           </div>
 
@@ -798,12 +807,19 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
                 type="text"
                 required
                 value={formData.dealMethod}
-                onChange={(e) =>
-                  setFormData({ ...formData, dealMethod: e.target.value })
-                }
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+                onChange={(e) => {
+                  setFormData({ ...formData, dealMethod: e.target.value });
+                  if (errors.dealMethod)
+                    setErrors({ ...errors, dealMethod: "" });
+                }}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                  errors.dealMethod ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="e.g., Collect from Waterway Point MRT"
               />
+              {errors.dealMethod && (
+                <p className="text-red-500 text-xs mt-1">{errors.dealMethod}</p>
+              )}
             </div>
           </div>
 
@@ -816,12 +832,18 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
               type="text"
               required
               value={formData.dimensions}
-              onChange={(e) =>
-                setFormData({ ...formData, dimensions: e.target.value })
-              }
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+              onChange={(e) => {
+                setFormData({ ...formData, dimensions: e.target.value });
+                if (errors.dimensions) setErrors({ ...errors, dimensions: "" });
+              }}
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                errors.dimensions ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="e.g., 30cm x 20cm x 15cm"
             />
+            {errors.dimensions && (
+              <p className="text-red-500 text-xs mt-1">{errors.dimensions}</p>
+            )}
           </div>
 
           {/* Description */}
