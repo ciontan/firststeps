@@ -192,37 +192,22 @@ export default function Navbar({
             {homeOpen && (
               <div className="space-y-2 ml-1">
                 <button
-<<<<<<< HEAD
-                  onClick={() => handleAboutNavigation('about-us')}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
-=======
                   onClick={() => handleAboutNavigation("about-us")}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
->>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <About className="w-6 h-6" />
                   About us
                 </button>
                 <button
-<<<<<<< HEAD
-                  onClick={() => handleAboutNavigation('our-vision')}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
-=======
                   onClick={() => handleAboutNavigation("our-vision")}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
->>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Vision className="w-6 h-6" />
                   Our Vision
                 </button>
                 <button
-<<<<<<< HEAD
-                  onClick={() => handleAboutNavigation('our-values')}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
-=======
                   onClick={() => handleAboutNavigation("our-values")}
-                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
->>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
                 >
                   <Values className="w-6 h-6" />
                   Our Values
@@ -337,17 +322,6 @@ export default function Navbar({
             </div>
             {cartOpen && (
               <div className="space-y-2 ml-1">
-<<<<<<< HEAD
-                <div className="flex items-center gap-2 text-md font-wix ">
-                  <Successful className="w-6 h-6" />
-                  Successful
-                </div>
-                <div className="flex items-center gap-2 text-md font-wix ">
-                  <Pending className="w-6 h-6" />
-                  Pending
-                </div>
-                <div className="flex items-center gap-2 text-md font-wix ">
-=======
                 <button
                   onClick={() => {
                     setIsOpen(false);
@@ -375,7 +349,6 @@ export default function Navbar({
                   }}
                   className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
                 >
->>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
                   <Rejected className="w-6 h-6" />
                   Rejected
                 </button>
