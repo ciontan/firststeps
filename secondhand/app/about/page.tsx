@@ -1,11 +1,13 @@
 "use client";
 import { Heart, Eye, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 export default function AboutPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     // Check for scroll target in URL params
@@ -79,16 +81,16 @@ export default function AboutPage() {
                     <p className="text-gray-700 leading-relaxed mb-4">
                       We envision a world where every parent has access to
                       quality baby products regardless of their budget. By
-                      promoting the reuse of baby items, we&#39;re building a more
-                      sustainable future for our children while supporting
+                      promoting the reuse of baby items, we&#39;re building a
+                      more sustainable future for our children while supporting
                       families in their parenting journey.
                     </p>
                     <p className="text-gray-700 leading-relaxed">
                       Our goal is to become the go-to platform for conscious
                       parents who want to make smart, eco-friendly choices
-                      without compromising on quality or safety. Together, we&#39;re
-                      creating a circular economy that benefits families and the
-                      planet.
+                      without compromising on quality or safety. Together,
+                      we&#39;re creating a circular economy that benefits
+                      families and the planet.
                     </p>
                   </div>
                 </div>
@@ -167,10 +169,16 @@ export default function AboutPage() {
                   own items to help other families.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors">
+                  <button
+                    onClick={() => router.push("/")}
+                    className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
+                  >
                     Start Shopping
                   </button>
-                  <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                  <button
+                    onClick={() => router.push("/listings")}
+                    className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  >
                     Sell Your Items
                   </button>
                 </div>
