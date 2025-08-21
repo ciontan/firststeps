@@ -5,11 +5,140 @@ import {
   getDoc,
   addDoc,
   updateDoc,
+  setDoc,
+  deleteDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebaseConfig";
 import type { Product } from "../types";
 import { CleaningStatus, Condition } from "../types";
+
+/**
+ * Upload image to Firebase Storage and return download URL
+ */
+export async function uploadImageToStorage(
+  file: File,
+  path: string,
+): Promise<string> {
+  console.log(
+    "uploadImageToStorage called with file:",
+    file.name,
+    "path:",
+    path,
+  );
+
+  try {
+    if (!file) {
+      throw new Error("No file provided");
+    }
+
+    if (!storage) {
+      throw new Error("Firebase storage not initialized");
+    }
+
+    const storageRef = ref(storage, path);
+    console.log("Uploading to storage reference:", storageRef);
+
+    const snapshot = await uploadBytes(storageRef, file);
+    console.log("Upload successful, getting download URL...");
+
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    console.log("Download URL obtained:", downloadURL);
+
+    return downloadURL;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      file: file ? file.name : "No file",
+      path,
+    });
+    throw error;
+  }
+}
+
+/**
+ * Save a new product to the products-template collection
+ */
+export async function saveProductToFirestore(productData: {
+  name: string;
+  brand: string;
+  price: number;
+  condition: string;
+  category: string;
+  description: string;
+  image: string;
+  ageRange: {
+    startAge: number;
+    endAge: number;
+  };
+  cleaningStatus: string;
+  dealMethod: string;
+  dimensions: string;
+  seller: {
+    name: string;
+    avatar: string;
+    rating: number;
+    review: number;
+  };
+  status?: string;
+}): Promise<string> {
+  console.log("saveProductToFirestore called with:", productData);
+
+  try {
+    // Validate required data
+    if (!productData.name || !productData.brand || !productData.price) {
+      throw new Error("Missing required product data");
+    }
+
+    // Prepare the product data in the correct format for Firestore
+    const firestoreProductData = {
+      name: productData.name,
+      brand: productData.brand,
+      price: Number(productData.price),
+      condition: productData.condition,
+      category: productData.category,
+      description: productData.description || "",
+      image: productData.image || "",
+      ageRange: {
+        startAge: Number(productData.ageRange.startAge),
+        endAge: Number(productData.ageRange.endAge),
+      },
+      cleaningStatus: productData.cleaningStatus,
+      dealMethod: productData.dealMethod,
+      dimensions: productData.dimensions,
+      seller: {
+        name: productData.seller.name,
+        avatar: productData.seller.avatar || "",
+        rating: Number(productData.seller.rating || 0),
+        review: Number(productData.seller.review || 0),
+      },
+      likes: 0, // Default likes
+      status: productData.status || "pending", // Default status
+      createdAt: new Date(), // Add timestamp
+    };
+
+    console.log("Prepared Firestore data:", firestoreProductData);
+
+    // Add the product to the products-template collection
+    const docRef = await addDoc(
+      collection(db, "products-template"),
+      firestoreProductData,
+    );
+
+    console.log("Product saved successfully with ID:", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error saving product to Firestore:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace",
+    });
+    throw error;
+  }
+}
 
 export async function fetchProductsFromFirestore(): Promise<Product[]> {
   try {

@@ -1,9 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import { CategoryType } from "../components/CategoryTabs";
 import { Plus, Edit3, Trash2, Eye, MoreHorizontal } from "lucide-react";
+import {
+  saveProductToFirestore,
+  uploadImageToStorage,
+  fetchProductsFromFirestore,
+} from "../services/firebaseService";
+import type { Product } from "../types";
 interface UserListing {
   id: string;
   name: string;
@@ -30,7 +36,6 @@ interface UserListing {
     rating: number;
     review: number;
     likes: number;
-    listings: string[];
   };
 }
 
@@ -48,14 +53,80 @@ const STATUS_LABELS = {
   pending: "Pending",
 };
 
-
 export default function ListingsPage() {
   const [listings, setListings] = useState<UserListing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "all" | "active" | "sold" | "draft" | "pending"
   >("all");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+
+  // Fetch user listings from Firebase
+  const fetchUserListings = async () => {
+    try {
+      if (!loading) setRefreshing(true); // Show refreshing state if not initial load
+      console.log("Fetching user listings from Firebase...");
+
+      // Fetch all products from the products-template collection
+      const allProducts = await fetchProductsFromFirestore();
+      console.log("All products fetched:", allProducts.length);
+
+      // Filter products where seller name is "Current User"
+      const userProducts = allProducts.filter(
+        (product) => product.seller.name === "Current User",
+      );
+      console.log("User products filtered:", userProducts.length);
+
+      // Map Product[] to UserListing[]
+      const userListings: UserListing[] = userProducts.map((product) => ({
+        id: product.id,
+        name: product.name,
+        brand: product.brand,
+        price: product.price,
+        condition: product.condition,
+        category: product.category,
+        image:
+          typeof product.image === "string"
+            ? product.image
+            : product.image.src || "",
+        description: product.description,
+        status:
+          (product.status as "pending" | "active" | "sold" | "draft") ||
+          "pending",
+        createdAt: new Date().toISOString(), // Default since createdAt might not exist
+        views: 0, // Default value
+        likes: product.likes || 0,
+        ageRange: {
+          startAge: product.ageRange.start_age,
+          endAge: product.ageRange.end_age,
+        },
+        cleaningStatus: product.cleaningStatus,
+        dealMethod: product.dealMethod,
+        dimensions: product.dimensions,
+        seller: {
+          name: product.seller.name,
+          avatar: product.seller.avatar,
+          rating: product.seller.rating,
+          review: product.seller.review,
+          likes: 0, // Default value for seller likes
+        },
+      }));
+
+      console.log("Mapped user listings:", userListings);
+      setListings(userListings);
+    } catch (error) {
+      console.error("Error fetching user listings:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserListings();
+  }, []);
 
   // Filter listings based on active tab
   const filteredListings = listings.filter((listing) => {
@@ -81,9 +152,9 @@ export default function ListingsPage() {
     console.log("Edit listing:", id);
   };
 
-    function onCategorySelect(category: CategoryType): void {
-        console.log("Selected category:", category);
-    }
+  function onCategorySelect(category: CategoryType): void {
+    console.log("Selected category:", category);
+  }
   return (
     <div className="min-h-screen bg-white">
       <Navbar
@@ -96,9 +167,16 @@ export default function ListingsPage() {
       <div className="pt-20 px-3 sm:px-4 lg:px-6 max-w-7xl mx-auto">
         {/* Header with Add Button */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold font-wix text-brown">
-            Your Items ({listings.length})
-          </h2>
+          <div className="flex flex-col">
+            <h2 className="text-xl sm:text-2xl font-bold font-wix text-brown">
+              Your Items ({listings.length})
+            </h2>
+            {refreshing && (
+              <p className="text-sm text-gray-500 mt-1">
+                Refreshing listings...
+              </p>
+            )}
+          </div>
           <button
             onClick={() => setShowAddForm(true)}
             className="bg-brown text-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 font-wix font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors text-sm sm:text-base"
@@ -134,7 +212,19 @@ export default function ListingsPage() {
         </div>
 
         {/* Listings Grid */}
-        {filteredListings.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 px-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-300 rounded-full"></div>
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-brown mb-2 text-center">
+              Loading your listings...
+            </h3>
+            <p className="text-gray-500 text-center text-sm sm:text-base max-w-md">
+              Please wait while we fetch your products
+            </p>
+          </div>
+        ) : filteredListings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
@@ -255,8 +345,9 @@ export default function ListingsPage() {
       {showAddForm && (
         <AddListingModal
           onClose={() => setShowAddForm(false)}
-          onAdd={(newListing) => {
-            setListings((prev) => [newListing, ...prev]);
+          onAdd={async (newListing) => {
+            // Refresh listings from Firebase to ensure we have the latest data
+            await fetchUserListings();
             setShowAddForm(false);
           }}
         />
@@ -268,7 +359,7 @@ export default function ListingsPage() {
 // Add Listing Modal Component
 interface AddListingModalProps {
   onClose: () => void;
-  onAdd: (listing: UserListing) => void;
+  onAdd: (listing: UserListing) => void | Promise<void>;
 }
 
 function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
@@ -277,7 +368,7 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
     brand: "",
     price: "",
     condition: "New",
-    category: "Baby Essentials",
+    category: "Baby essentials",
     description: "",
     image: "",
     // New Firebase fields
@@ -290,11 +381,13 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const conditions = ["New", "Like New", "Good", "Fair", "Poor"];
   const cleaningStatuses = ["Not washed", "Washed", "Sanitized"];
   const categories = [
-    "Baby Essentials",
+    "Baby essentials",
     "Clothes",
     "Toys",
     "Furniture",
@@ -338,44 +431,166 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
     if (fileInput) fileInput.value = "";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) newErrors.name = "Item name is required";
+    if (!formData.brand.trim()) newErrors.brand = "Brand is required";
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      newErrors.price = "Valid price is required";
+    }
+    if (!formData.startAge) newErrors.startAge = "Start age is required";
+    if (!formData.endAge) newErrors.endAge = "End age is required";
+    if (!formData.dealMethod.trim())
+      newErrors.dealMethod = "Deal method is required";
+    if (!formData.dimensions.trim())
+      newErrors.dimensions = "Dimensions are required";
+
+    // Age range validation
+    if (formData.startAge && formData.endAge) {
+      const start = parseInt(formData.startAge);
+      const end = parseInt(formData.endAge);
+      if (start >= end) {
+        newErrors.endAge = "End age must be greater than start age";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // In a real app, you would upload the image to your storage service here
-    // For now, we'll use the preview URL or a placeholder
-    const imageUrl = imagePreview || "/api/placeholder/300/300";
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
 
-    const newListing: UserListing = {
-      id: Date.now().toString(),
-      name: formData.name,
-      brand: formData.brand,
-      price: parseFloat(formData.price),
-      condition: formData.condition,
-      category: formData.category,
-      description: formData.description,
-      image: imageUrl,
-      status: "pending",
-      createdAt: new Date().toISOString().split("T")[0],
-      views: 0,
-      likes: 0,
-      ageRange: {
-        startAge: parseInt(formData.startAge) || 0,
-        endAge: parseInt(formData.endAge) || 0,
-      },
-      cleaningStatus: formData.cleaningStatus,
-      dealMethod: formData.dealMethod,
-      dimensions: formData.dimensions,
-      seller: {
-        name: "Current User", // Replace with actual user data
-        avatar: "",
-        rating: 0,
-        review: 0,
+    setIsSubmitting(true);
+    console.log("Starting form submission...");
+
+    try {
+      let imageUrl = "";
+
+      // For now, skip Firebase Storage upload due to CORS issues in development
+      // Use placeholder or base64 image instead
+      if (imageFile) {
+        console.log(
+          "Image file selected, but skipping Firebase Storage upload due to CORS issues",
+        );
+        // Use the preview URL for now (base64)
+        imageUrl = imagePreview || "/api/placeholder/300/300";
+      } else {
+        // Use a placeholder image if no image is uploaded
+        imageUrl = "/api/placeholder/300/300";
+        console.log("Using placeholder image");
+      }
+
+      // TODO: Once CORS is configured, uncomment the following lines:
+      // if (imageFile) {
+      //   console.log("Uploading image...");
+      //   const timestamp = Date.now();
+      //   const imagePath = `products/${timestamp}_${imageFile.name}`;
+      //   imageUrl = await uploadImageToStorage(imageFile, imagePath);
+      //   console.log("Image uploaded successfully:", imageUrl);
+      // }
+
+      // Prepare product data for Firebase
+      const productData = {
+        name: formData.name,
+        brand: formData.brand,
+        price: parseFloat(formData.price),
+        condition: formData.condition,
+        category: formData.category,
+        description: formData.description,
+        image: imageUrl,
+        ageRange: {
+          startAge: parseInt(formData.startAge) || 0,
+          endAge: parseInt(formData.endAge) || 0,
+        },
+        cleaningStatus: formData.cleaningStatus,
+        dealMethod: formData.dealMethod,
+        dimensions: formData.dimensions,
+        seller: {
+          name: "Current User", // Replace with actual user data when auth is implemented
+          avatar: "",
+          rating: 0,
+          review: 0,
+        },
+        status: "pending", // Default status for new listings
+      };
+
+      console.log("Saving product to Firestore...", productData);
+      // Save to Firebase
+      const productId = await saveProductToFirestore(productData);
+      console.log("Product saved with ID:", productId);
+
+      // Create local listing object for immediate UI update
+      const newListing: UserListing = {
+        id: productId,
+        name: formData.name,
+        brand: formData.brand,
+        price: parseFloat(formData.price),
+        condition: formData.condition,
+        category: formData.category,
+        description: formData.description,
+        image: imageUrl,
+        status: "pending",
+        createdAt: new Date().toISOString().split("T")[0],
+        views: 0,
         likes: 0,
-        listings: [],
-      },
-    };
+        ageRange: {
+          startAge: parseInt(formData.startAge) || 0,
+          endAge: parseInt(formData.endAge) || 0,
+        },
+        cleaningStatus: formData.cleaningStatus,
+        dealMethod: formData.dealMethod,
+        dimensions: formData.dimensions,
+        seller: {
+          name: "Current User",
+          avatar: "",
+          rating: 0,
+          review: 0,
+          likes: 0,
+        },
+      };
 
-    onAdd(newListing);
+      console.log("Refreshing listings and closing modal...");
+      await onAdd(newListing);
+
+      // Reset form data
+      setFormData({
+        name: "",
+        brand: "",
+        price: "",
+        condition: "New",
+        category: "Baby essentials",
+        description: "",
+        image: "",
+        startAge: "",
+        endAge: "",
+        cleaningStatus: "Not washed",
+        dealMethod: "",
+        dimensions: "",
+      });
+
+      // Reset image data
+      setImageFile(null);
+      setImagePreview("");
+      setErrors({});
+
+      // Show success message
+      alert("Product listing created successfully!");
+    } catch (error) {
+      console.error("Error creating listing:", error);
+      alert(
+        `Failed to create listing: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      console.log("Setting isSubmitting to false");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -417,12 +632,18 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
               type="text"
               required
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+              onChange={(e) => {
+                setFormData({ ...formData, name: e.target.value });
+                if (errors.name) setErrors({ ...errors, name: "" });
+              }}
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="e.g., Baby Stroller"
             />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* Brand */}
@@ -434,12 +655,18 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
               type="text"
               required
               value={formData.brand}
-              onChange={(e) =>
-                setFormData({ ...formData, brand: e.target.value })
-              }
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+              onChange={(e) => {
+                setFormData({ ...formData, brand: e.target.value });
+                if (errors.brand) setErrors({ ...errors, brand: "" });
+              }}
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                errors.brand ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="e.g., Chicco"
             />
+            {errors.brand && (
+              <p className="text-red-500 text-xs mt-1">{errors.brand}</p>
+            )}
           </div>
 
           {/* Price and Condition */}
@@ -451,14 +678,21 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
               <input
                 type="number"
                 step="0.01"
+                min="0"
                 required
                 value={formData.price}
-                onChange={(e) =>
-                  setFormData({ ...formData, price: e.target.value })
-                }
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+                onChange={(e) => {
+                  setFormData({ ...formData, price: e.target.value });
+                  if (errors.price) setErrors({ ...errors, price: "" });
+                }}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${
+                  errors.price ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="0.00"
               />
+              {errors.price && (
+                <p className="text-red-500 text-xs mt-1">{errors.price}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -478,6 +712,26 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category *
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Age Range */}
@@ -702,15 +956,17 @@ function AddListingModal({ onClose, onAdd }: AddListingModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:flex-1 px-6 py-2.5 sm:py-3 border border-gray-300 text-gray-700 rounded-full font-wix font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base"
+              disabled={isSubmitting}
+              className="w-full sm:flex-1 px-6 py-2.5 sm:py-3 border border-gray-300 text-gray-700 rounded-full font-wix font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="w-full sm:flex-1 px-6 py-2.5 sm:py-3 bg-brown text-white rounded-full font-wix font-bold hover:bg-opacity-90 transition-colors text-sm sm:text-base"
+              disabled={isSubmitting}
+              className="w-full sm:flex-1 px-6 py-2.5 sm:py-3 bg-brown text-white rounded-full font-wix font-bold hover:bg-opacity-90 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add Listing
+              {isSubmitting ? "Creating Listing..." : "Add Listing"}
             </button>
           </div>
         </form>
