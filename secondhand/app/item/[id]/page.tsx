@@ -5,7 +5,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function ItemDetailPage({ params }: PageProps) {
-  const { id } = use(params);
+export default async function ItemDetailPage({ params }: PageProps) {
+  const { id } = await params;
   return <ItemDetails id={id} />;
 }
