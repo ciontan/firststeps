@@ -19,9 +19,9 @@ export async function GET() {
 
   return Response.json({
     accountAssociation: {
-      header: process.env.FARCASTER_HEADER || "",
-      payload: process.env.FARCASTER_PAYLOAD || "",
-      signature: process.env.FARCASTER_SIGNATURE || "",
+      header: process.env.NEXT_PUBLIC_FARCASTER_HEADER || "",
+      payload: process.env.NEXT_PUBLIC_FARCASTER_PAYLOAD || "",
+      signature: process.env.NEXT_PUBLIC_FARCASTER_SIGNATURE || "",
     },
     baseBuilder: {
       allowedAddresses: ["0x14F6CBaa0c98202f29bFE871405bF2BC2F831AB6"],
