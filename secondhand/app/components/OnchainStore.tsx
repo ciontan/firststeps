@@ -14,7 +14,7 @@ function OnchainStoreContent() {
   return (
     <div className="relative flex h-full max-h-screen max-w-full flex-col font-sansMono">
       <Banner />
-      <Navbar />
+      <Navbar onCategorySelect={onCategoryChange} />
       <main className="mx-auto flex max-w-5xl w-full grow flex-col pt-[4rem] pb-10">
         <SearchBar onSearch={onSearch} />
         <CategoryTabs onCategoryChange={onCategoryChange} />
@@ -23,7 +23,7 @@ function OnchainStoreContent() {
       </main>
     </div>
   );
-}
+} 
 
 export default function OnchainStore() {
   return (

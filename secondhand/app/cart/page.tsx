@@ -17,6 +17,13 @@ const TAB_LIST = [
   { key: "rejected", label: "Rejected" },
 ];
 
+// Status background colors mapping
+const STATUS_BG_COLORS = {
+  successful: "bg-[#FFF7F3]", // Current cream color
+  pending: "bg-[#FBEEDF]",    // Light orange/peach
+  rejected: "bg-[#FFA9A9]"    // Light red/pink
+};
+
 export default function ShoppingCartHeader() {
   const cartItems = useCartStore((state) => state.items) as CartItem[];
   const [activeTab, setActiveTab] = useState("successful");
@@ -86,7 +93,7 @@ export default function ShoppingCartHeader() {
               {filteredItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center bg-[#FFF7F3] rounded-2xl p-3 gap-4"
+                  className={`flex items-center ${STATUS_BG_COLORS[item.status]} rounded-2xl p-3 gap-4`}
                 >
                   <div className="w-[72px] h-[72px] sm:w-20 sm:h-20 flex-shrink-0">
                     <img

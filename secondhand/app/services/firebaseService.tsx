@@ -1,5 +1,13 @@
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../firebaseConfig";
 import type { Product } from "../types";
 import { CleaningStatus, Condition } from "../types";
 
@@ -155,4 +163,58 @@ export function filterProductsByCategory(
       product.category.toLowerCase() === targetCategoryString.toLowerCase()
     );
   });
+}
+
+export async function saveNewListing(
+  listingData: Omit<Product, "id">,
+  imageFile: File | null,
+): Promise<Product> {
+  try {
+    let imageUrl = "";
+
+    // Upload image if provided
+    if (imageFile) {
+      const storageRef = ref(
+        storage,
+        `listings/${Date.now()}_${imageFile.name}`,
+      );
+      const snapshot = await uploadBytes(storageRef, imageFile);
+      imageUrl = await getDownloadURL(snapshot.ref);
+    }
+
+    // Prepare the listing data
+    const listing = {
+      ...listingData,
+      image: imageUrl,
+      createdAt: new Date().toISOString(),
+      status: "pending",
+      likes: 0,
+    };
+
+    // Add listing to Firestore
+    const docRef = await addDoc(collection(db, "products-template"), listing);
+
+    // Return the created listing with its ID
+    return {
+      ...listing,
+      id: docRef.id,
+    } as Product;
+  } catch (error) {
+    console.error("Error saving new listing:", error);
+    throw error;
+  }
+}
+
+// Function to update a listing's status
+export async function updateListingStatus(
+  listingId: string,
+  status: string,
+): Promise<void> {
+  try {
+    const listingRef = doc(db, "products-template", listingId);
+    await updateDoc(listingRef, { status });
+  } catch (error) {
+    console.error("Error updating listing status:", error);
+    throw error;
+  }
 }
