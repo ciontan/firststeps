@@ -1,11 +1,13 @@
 "use client";
 import { Heart, Eye, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 export default function AboutPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     // Check for scroll target in URL params
@@ -156,18 +158,18 @@ export default function AboutPage() {
                   own items to help other families.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a
-                    href="/"
-                    className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors text-center"
+                  <button
+                    onClick={() => router.push("/")}
+                    className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
                   >
                     Start Shopping
-                  </a>
-                  <a
-                    href="/listings"
-                    className="bg-brown text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors text-center"
+                  </button>
+                  <button
+                    onClick={() => router.push("/listings")}
+                    className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
                   >
                     Sell Your Items
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

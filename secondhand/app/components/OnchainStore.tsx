@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Banner } from "./Banner";
 import Navbar from "./Navbar";
 import CategoryTabs from "./CategoryTabs";
-import OnchainStoreCart from "./OnchainStoreCart";
 import OnchainStoreItems from "./OnchainStoreItems";
 import { OnchainStoreProvider } from "./OnchainStoreProvider";
 import SearchBar from "./SearchBar";
@@ -19,11 +18,10 @@ function OnchainStoreContent() {
         <SearchBar onSearch={onSearch} />
         <CategoryTabs onCategoryChange={onCategoryChange} />
         <OnchainStoreItems />
-        <OnchainStoreCart />
       </main>
     </div>
   );
-} 
+}
 
 export default function OnchainStore() {
   return (

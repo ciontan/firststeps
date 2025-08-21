@@ -76,15 +76,15 @@ export default function Navbar({
   // Handle navigation to about page sections
   const handleAboutNavigation = (sectionId: string) => {
     setIsOpen(false); // Close the sidebar
-    
+
     if (pathname === "/about") {
       // If already on about page, just scroll to section
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
-          element.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
           });
         }
       }, 100);
@@ -192,22 +192,37 @@ export default function Navbar({
             {homeOpen && (
               <div className="space-y-2 ml-1">
                 <button
+<<<<<<< HEAD
                   onClick={() => handleAboutNavigation('about-us')}
                   className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+=======
+                  onClick={() => handleAboutNavigation("about-us")}
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+>>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
                 >
                   <About className="w-6 h-6" />
                   About us
                 </button>
                 <button
+<<<<<<< HEAD
                   onClick={() => handleAboutNavigation('our-vision')}
                   className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+=======
+                  onClick={() => handleAboutNavigation("our-vision")}
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+>>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
                 >
                   <Vision className="w-6 h-6" />
                   Our Vision
                 </button>
                 <button
+<<<<<<< HEAD
                   onClick={() => handleAboutNavigation('our-values')}
                   className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+=======
+                  onClick={() => handleAboutNavigation("our-values")}
+                  className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+>>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
                 >
                   <Values className="w-6 h-6" />
                   Our Values
@@ -322,6 +337,7 @@ export default function Navbar({
             </div>
             {cartOpen && (
               <div className="space-y-2 ml-1">
+<<<<<<< HEAD
                 <div className="flex items-center gap-2 text-md font-wix ">
                   <Successful className="w-6 h-6" />
                   Successful
@@ -331,9 +347,38 @@ export default function Navbar({
                   Pending
                 </div>
                 <div className="flex items-center gap-2 text-md font-wix ">
+=======
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/cart?tab=successful");
+                  }}
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                >
+                  <Successful className="w-6 h-6" />
+                  Successful
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/cart?tab=pending");
+                  }}
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                >
+                  <Pending className="w-6 h-6" />
+                  Pending
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/cart?tab=rejected");
+                  }}
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                >
+>>>>>>> 62f19bc30f60dcaeed576ff21fcc3ada7cdbd7c2
                   <Rejected className="w-6 h-6" />
                   Rejected
-                </div>
+                </button>
               </div>
             )}
           </div>
