@@ -1,6 +1,6 @@
-
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyChYIY07bLAWX2eCfn2jOSFnVxDhO9SblM",
@@ -9,10 +9,11 @@ const firebaseConfig = {
   storageBucket: "secondhand-54edb.firebasestorage.app",
   messagingSenderId: "189408722916",
   appId: "1:189408722916:web:bffb02014fccb52f8651f1",
-  measurementId: "G-K5LV9LD0T5"
+  measurementId: "G-K5LV9LD0T5",
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { db };
+export { db, storage };

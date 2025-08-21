@@ -59,7 +59,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({ onCategoryChange }) => {
               >
                 <div className="flex items-center space-x-2">
                   <Icon
-                    className={`w-8 h-8 text-brown${isActive ? "" : " opacity-50"}`}
+                    className={`w-8 h-8 ${isActive ? "text-brown" : "text-brown opacity-50"}`}
                   />
                   <span
                     className={`text-sm font-wix ${

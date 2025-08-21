@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Logo from "../svg/Logo";
 import { ShoppingCart, Menu, ChevronDown, ChevronUp } from "lucide-react";
 import { About } from "../svg/About";
@@ -13,14 +14,30 @@ import { Listing } from "../svg/Listing";
 import Link from "next/link";
 import All from "../svg/Categories/All";
 import React from "react";
+import useOnchainStoreContext from "./OnchainStoreProvider";
+import { CategoryType } from "./CategoryTabs";
+
+// Add this debug check at the top level
+console.log("Navbar - useOnchainStoreContext import:", useOnchainStoreContext);
 
 export default function Navbar({
   centerContent,
+  onCategorySelect,
 }: {
   centerContent?: React.ReactNode;
+  onCategorySelect?: (category: CategoryType) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const cartItems = useCartStore((state) => state.items);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Remove the context usage for now
+  // const context = useOnchainStoreContext();
+  // const { selectedCategory, onCategoryChange } = context;
+
+  // Check if we're on the cart page
+  const isCartPage = pathname === "/cart";
 
   // Section expand/collapse state
   const [profileOpen, setProfileOpen] = useState(true);
@@ -36,7 +53,24 @@ export default function Navbar({
     Furniture: require("../svg/Categories/Furniture").default,
     Learning: require("../svg/Categories/Learning").default,
     Sports: require("../svg/Categories/Sports").default,
-    // Add other icons as needed
+  };
+
+  // Handle category selection
+  const handleCategorySelect = (categoryId: CategoryType) => {
+    if (onCategorySelect) {
+      onCategorySelect(categoryId);
+    } else {
+      console.warn("onCategorySelect prop not provided to Navbar");
+    }
+
+    // Close the sidebar
+    setIsOpen(false);
+
+    // Navigate to the main page (adjust the route as needed)
+    // If you're already on the main page, this might not be necessary
+    if (pathname !== "/") {
+      router.push("/");
+    }
   };
 
   return (
@@ -56,24 +90,26 @@ export default function Navbar({
               {centerContent ? centerContent : <Logo />}
             </div>
             <div className="flex items-center relative">
-              <Link href="/cart">
-                <div className="relative">
-                  <ShoppingCart className="text-brown" />
-                  {cartItems.length > 0 && (
-                    <div
-                      className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                      style={{
-                        top: "2px",
-                        right: "5px",
-                        transform: "translate(50%,-50%)",
-                        zIndex: 1,
-                      }}
-                    >
-                      {cartItems.length}
-                    </div>
-                  )}
-                </div>
-              </Link>
+              {!isCartPage && (
+                <Link href="/cart">
+                  <div className="relative">
+                    <ShoppingCart className="text-brown" />
+                    {cartItems.length > 0 && (
+                      <div
+                        className="absolute bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                        style={{
+                          top: "2px",
+                          right: "5px",
+                          transform: "translate(50%,-50%)",
+                          zIndex: 1,
+                        }}
+                      >
+                        {cartItems.length}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -164,34 +200,55 @@ export default function Navbar({
             </div>
             {exploreOpen && (
               <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 font-wix text-md">
+                <button
+                  onClick={() => handleCategorySelect("all")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <All className="w-6 h-6" />
                   All
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
+                </button>
+                <button
+                  onClick={() => handleCategorySelect("baby")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <Icons.Essentials className="w-6 h-6" />
                   Baby Essentials
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
+                </button>
+                <button
+                  onClick={() => handleCategorySelect("clothes")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <Icons.Clothes className="w-6 h-6" />
                   Clothes
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
+                </button>
+                <button
+                  onClick={() => handleCategorySelect("toys")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <Icons.Toys className="w-6 h-6" />
                   Toys
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
+                </button>
+                <button
+                  onClick={() => handleCategorySelect("furniture")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <Icons.Furniture className="w-6 h-6" />
                   Furniture
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
+                </button>
+                <button
+                  onClick={() => handleCategorySelect("learning")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <Icons.Learning className="w-6 h-6" />
                   Learning
-                </div>
-                <div className="flex items-center gap-2 font-wix text-md">
+                </button>
+                <button
+                  onClick={() => handleCategorySelect("sports")}
+                  className="flex items-center gap-2 font-wix text-md hover:bg-[#FFEFE3] rounded-md transition-colors w-full text-left"
+                >
                   <Icons.Sports className="w-6 h-6" />
                   Sports
-                </div>
+                </button>
               </div>
             )}
           </div>
@@ -210,10 +267,13 @@ export default function Navbar({
             </div>
             {profileOpen && (
               <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 text-md font-wix">
+                <button
+                  onClick={() => router.push("/listings")}
+                  className="flex items-center gap-2 text-md font-wix"
+                >
                   <Listing className="w-6 h-6" />
                   Listings
-                </div>
+                </button>
               </div>
             )}
           </div>
