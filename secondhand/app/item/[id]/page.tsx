@@ -1,7 +1,11 @@
-import { use } from 'react';
-import ItemDetails from '../../components/ItemDetails';
+import { use } from "react";
+import ItemDetails from "../../components/ItemDetails";
 
-export default function ItemDetailPage({ params }: { params: { id: string } }) {
-  const unwrappedParams = use(Promise.resolve(params));
-  return <ItemDetails id={unwrappedParams.id} />;
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function ItemDetailPage({ params }: PageProps) {
+  const { id } = use(params);
+  return <ItemDetails id={id} />;
 }

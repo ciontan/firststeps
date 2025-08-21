@@ -76,15 +76,15 @@ export default function Navbar({
   // Handle navigation to about page sections
   const handleAboutNavigation = (sectionId: string) => {
     setIsOpen(false); // Close the sidebar
-    
+
     if (pathname === "/about") {
       // If already on about page, just scroll to section
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
-          element.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
           });
         }
       }, 100);
@@ -192,21 +192,21 @@ export default function Navbar({
             {homeOpen && (
               <div className="space-y-2 ml-1">
                 <button
-                  onClick={() => handleAboutNavigation('about-us')}
+                  onClick={() => handleAboutNavigation("about-us")}
                   className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
                 >
                   <About className="w-6 h-6" />
                   About us
                 </button>
                 <button
-                  onClick={() => handleAboutNavigation('our-vision')}
+                  onClick={() => handleAboutNavigation("our-vision")}
                   className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
                 >
                   <Vision className="w-6 h-6" />
                   Our Vision
                 </button>
                 <button
-                  onClick={() => handleAboutNavigation('our-values')}
+                  onClick={() => handleAboutNavigation("our-values")}
                   className="font-wix flex items-center gap-2 text-md hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
                 >
                   <Values className="w-6 h-6" />
@@ -322,18 +322,36 @@ export default function Navbar({
             </div>
             {cartOpen && (
               <div className="space-y-2 ml-1">
-                <div className="flex items-center gap-2 text-md font-wix p-2">
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/cart?tab=successful");
+                  }}
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                >
                   <Successful className="w-6 h-6" />
                   Successful
-                </div>
-                <div className="flex items-center gap-2 text-md font-wix p-2">
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/cart?tab=pending");
+                  }}
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                >
                   <Pending className="w-6 h-6" />
                   Pending
-                </div>
-                <div className="flex items-center gap-2 text-md font-wix p-2">
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/cart?tab=rejected");
+                  }}
+                  className="flex items-center gap-2 text-md font-wix hover:bg-[#FFEFE3] rounded-md p-2 transition-colors w-full text-left"
+                >
                   <Rejected className="w-6 h-6" />
                   Rejected
-                </div>
+                </button>
               </div>
             )}
           </div>
