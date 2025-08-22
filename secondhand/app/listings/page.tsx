@@ -164,56 +164,65 @@ export default function ListingsPage() {
         onCategorySelect={onCategorySelect}
       />
 
-      <div className="pt-20 px-3 sm:px-4 lg:px-6 max-w-7xl mx-auto">
-        {/* Header with Add Button */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div className="flex flex-col">
-            <h2 className="text-xl sm:text-2xl font-bold font-wix text-brown">
-              Your Items ({listings.length})
-            </h2>
-            {refreshing && (
-              <p className="text-sm text-gray-500 mt-1">
-                Refreshing listings...
-              </p>
+      {/* Sticky Header with Add Button and Tabs - Fixed positioning */}
+      <div className="sticky top-16 z-40 bg-white border-b border-gray-100 shadow-sm">
+        <div className="px-3 sm:px-4 lg:px-6 max-w-7xl mx-auto py-4">
+          {/* Header with Add Button */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+            <div className="flex flex-col">
+              <h2 className="text-xl sm:text-2xl font-bold font-wix text-brown">
+                Your Items ({listings.length})
+              </h2>
+              {refreshing && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Refreshing listings...
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-brown text-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 font-wix font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors text-sm sm:text-base"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Add Listing</span>
+              <span className="sm:hidden">Add</span>
+            </button>
+          </div>
+
+          {/* Status Tabs */}
+          <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {(["all", "active", "pending", "sold", "draft"] as const).map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-3 sm:px-4 py-2 rounded-full font-wix text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+                    activeTab === tab
+                      ? "bg-brown text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <span className="hidden sm:inline">
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)} ({counts[tab]})
+                  </span>
+                  <span className="sm:hidden">
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </span>
+                </button>
+              ),
             )}
           </div>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-brown text-white rounded-full px-4 sm:px-6 py-2.5 sm:py-3 font-wix font-bold flex items-center justify-center gap-2 hover:bg-opacity-90 transition-colors text-sm sm:text-base"
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">Add Listing</span>
-            <span className="sm:hidden">Add</span>
-          </button>
         </div>
+      </div>
 
-        {/* Status Tabs */}
-        <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
-          {(["all", "active", "pending", "sold", "draft"] as const).map(
-            (tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-3 sm:px-4 py-2 rounded-full font-wix text-xs sm:text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
-                  activeTab === tab
-                    ? "bg-brown text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                <span className="hidden sm:inline">
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)} ({counts[tab]})
-                </span>
-                <span className="sm:hidden">
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </span>
-              </button>
-            ),
-          )}
-        </div>
-
+      {/* Main content area - Fixed spacing from top of viewport */}
+      <div
+        className="px-3 sm:px-4 lg:px-6 max-w-7xl mx-auto"
+        style={{ paddingTop: "180px" }}
+      >
         {/* Listings Grid */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="flex flex-col items-center justify-center py-6 px-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-300 rounded-full"></div>
             </div>
@@ -225,7 +234,7 @@ export default function ListingsPage() {
             </p>
           </div>
         ) : filteredListings.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4">
+          <div className="flex flex-col items-center justify-center py-6 px-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
             </div>
