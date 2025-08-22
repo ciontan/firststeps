@@ -1,3 +1,49 @@
+/**
+ * Fetch products from Firestore by seller name
+ */
+export async function fetchProductsBySellerName(sellerName: string): Promise<Product[]> {
+  try {
+    const productsRef = collection(db, "products-template");
+    const q = query(productsRef, where("seller.name", "==", sellerName));
+    const querySnapshot = await getDocs(q);
+    const products: Product[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const product: Product = {
+        id: doc.id,
+        name: data.name || "",
+        price: data.price || 0,
+        image: data.image || "",
+        description: data.description || "",
+        condition: (data.condition as Condition) || Condition.LikeNew,
+        ageRange: {
+          start_age: data.ageRange?.startAge || data.ageRange?.start_age || 0,
+          end_age: data.ageRange?.endAge || data.ageRange?.end_age || 0,
+        },
+        brand: data.brand || "",
+        cleaningStatus:
+          (data.cleaningStatus as CleaningStatus) || CleaningStatus.Washed,
+        dimensions: data.dimensions || "",
+        dealMethod: data.dealMethod || "",
+        seller: {
+          name: data.seller?.name || "",
+          rating: data.seller?.rating || 0,
+          review: data.seller?.review || 0,
+          avatar: data.seller?.avatar?.replace(/^"|"$/g, "") || "",
+          listings: data.seller?.listings || [],
+        },
+        likes: data.likes || 0,
+        category: data.category || "Baby essentials",
+        status: data.status || "pending",
+      };
+      products.push(product);
+    });
+    return products;
+  } catch (error) {
+    console.error("Error fetching products by seller name:", error);
+    return [];
+  }
+}
 import {
   collection,
   getDocs,

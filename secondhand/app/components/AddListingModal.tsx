@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { uploadImageToStorage, saveProductToFirestore } from "../services/firebaseService";
+import {
+  uploadImageToStorage,
+  saveProductToFirestore,
+} from "../services/firebaseService";
 
 interface AddListingModalProps {
   onClose: () => void;
@@ -17,7 +20,10 @@ const categories = [
   "Sports",
 ];
 
-const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => {
+const AddListingModal: React.FC<AddListingModalProps> = ({
+  onClose,
+  onAdd,
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
@@ -60,9 +66,13 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
   const removeImage = () => {
     setImageFile(null);
     setImagePreview("");
-    const fileInput = document.getElementById("takePhotoInput") as HTMLInputElement;
+    const fileInput = document.getElementById(
+      "takePhotoInput",
+    ) as HTMLInputElement;
     if (fileInput) fileInput.value = "";
-    const fileInput2 = document.getElementById("uploadImageInput") as HTMLInputElement;
+    const fileInput2 = document.getElementById(
+      "uploadImageInput",
+    ) as HTMLInputElement;
     if (fileInput2) fileInput2.value = "";
   };
 
@@ -75,8 +85,10 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
     }
     if (!formData.startAge) newErrors.startAge = "Start age is required";
     if (!formData.endAge) newErrors.endAge = "End age is required";
-    if (!formData.dealMethod.trim()) newErrors.dealMethod = "Deal method is required";
-    if (!formData.dimensions.trim()) newErrors.dimensions = "Dimensions are required";
+    if (!formData.dealMethod.trim())
+      newErrors.dealMethod = "Deal method is required";
+    if (!formData.dimensions.trim())
+      newErrors.dimensions = "Dimensions are required";
     if (formData.startAge && formData.endAge) {
       const start = parseInt(formData.startAge);
       const end = parseInt(formData.endAge);
@@ -92,7 +104,7 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
     e.preventDefault();
     const isValid = validateForm();
     if (!isValid) return;
-    
+
     setIsSubmitting(true);
     try {
       let imageUrl = "";
@@ -107,7 +119,9 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
         } catch (uploadError) {
           console.error("Image upload failed:", uploadError);
           // Fall back to base64 or continue without image based on your preference
-          alert("Image upload failed. The listing will be created without an image.");
+          alert(
+            "Image upload failed. The listing will be created without an image.",
+          );
           // Optionally use base64: imageUrl = await uploadImageAsBase64(imageFile);
         }
       }
@@ -155,8 +169,18 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
         },
       };
 
-      // Call the onAdd callback
-      await onAdd(newListing);
+      // Fetch updated listings for this seller and pass to onAdd
+      import("../services/firebaseService").then(
+        ({ fetchProductsBySellerName }) => {
+          fetchProductsBySellerName("Current User").then((sellerListings) => {
+            // Only show listings with seller name 'Current User'
+            const filteredListings = sellerListings.filter(
+              (listing) => listing.seller?.name === "Current User",
+            );
+            onAdd(filteredListings);
+          });
+        },
+      );
 
       // Reset form
       setFormData({
@@ -176,13 +200,14 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
       setImageFile(null);
       setImagePreview("");
       setErrors({});
-      
+
       alert("Product listing created successfully!");
       onClose(); // Close the modal after successful submission
-      
     } catch (error) {
       console.error("Error creating listing:", error);
-      alert(`Failed to create listing: ${error instanceof Error ? error.message : "Unknown error"}`);
+      alert(
+        `Failed to create listing: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -193,10 +218,25 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
       <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] sm:max-h-[70vh] mt-8 overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold font-wix text-brown">Add New Listing</h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <h2 className="text-lg sm:text-xl font-bold font-wix text-brown">
+              Add New Listing
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -204,7 +244,9 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           {/* Item Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Item Name *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Item Name *
+            </label>
             <input
               type="text"
               required
@@ -216,12 +258,16 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
               className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.name ? "border-red-500" : "border-gray-300"}`}
               placeholder="e.g., Baby Stroller"
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* Brand */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Brand *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Brand *
+            </label>
             <input
               type="text"
               required
@@ -233,13 +279,17 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
               className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.brand ? "border-red-500" : "border-gray-300"}`}
               placeholder="e.g., Chicco"
             />
-            {errors.brand && <p className="text-red-500 text-xs mt-1">{errors.brand}</p>}
+            {errors.brand && (
+              <p className="text-red-500 text-xs mt-1">{errors.brand}</p>
+            )}
           </div>
 
           {/* Price and Condition */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price ($) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Price ($) *
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -253,17 +303,25 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
                 className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.price ? "border-red-500" : "border-gray-300"}`}
                 placeholder="25.00"
               />
-              {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
+              {errors.price && (
+                <p className="text-red-500 text-xs mt-1">{errors.price}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Condition *
+              </label>
               <select
                 value={formData.condition}
-                onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, condition: e.target.value })
+                }
                 className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
               >
                 {conditions.map((condition) => (
-                  <option key={condition} value={condition}>{condition}</option>
+                  <option key={condition} value={condition}>
+                    {condition}
+                  </option>
                 ))}
               </select>
             </div>
@@ -271,24 +329,34 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category *
+            </label>
             <select
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
               className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
             >
               {categories.map((category) => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
           </div>
 
           {/* Age Range */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Suitable Age Range (months) *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Suitable Age Range (months) *
+            </label>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">From (months)</label>
+                <label className="block text-xs text-gray-500 mb-1">
+                  From (months)
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -302,10 +370,14 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
                   className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.startAge ? "border-red-500" : "border-gray-300"}`}
                   placeholder="0"
                 />
-                {errors.startAge && <p className="text-red-500 text-xs mt-1">{errors.startAge}</p>}
+                {errors.startAge && (
+                  <p className="text-red-500 text-xs mt-1">{errors.startAge}</p>
+                )}
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">To (months)</label>
+                <label className="block text-xs text-gray-500 mb-1">
+                  To (months)
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -319,46 +391,63 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
                   className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.endAge ? "border-red-500" : "border-gray-300"}`}
                   placeholder="36"
                 />
-                {errors.endAge && <p className="text-red-500 text-xs mt-1">{errors.endAge}</p>}
+                {errors.endAge && (
+                  <p className="text-red-500 text-xs mt-1">{errors.endAge}</p>
+                )}
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Enter the age range in months (e.g., 0-6 months, 12-24 months)</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Enter the age range in months (e.g., 0-6 months, 12-24 months)
+            </p>
           </div>
 
           {/* Cleaning Status and Deal Method */}
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Cleaning Status *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Cleaning Status *
+              </label>
               <select
                 value={formData.cleaningStatus}
-                onChange={(e) => setFormData({ ...formData, cleaningStatus: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, cleaningStatus: e.target.value })
+                }
                 className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base"
               >
                 {cleaningStatuses.map((status) => (
-                  <option key={status} value={status}>{status}</option>
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Deal Method *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Deal Method *
+              </label>
               <input
                 type="text"
                 required
                 value={formData.dealMethod}
                 onChange={(e) => {
                   setFormData({ ...formData, dealMethod: e.target.value });
-                  if (errors.dealMethod) setErrors({ ...errors, dealMethod: "" });
+                  if (errors.dealMethod)
+                    setErrors({ ...errors, dealMethod: "" });
                 }}
                 className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.dealMethod ? "border-red-500" : "border-gray-300"}`}
                 placeholder="e.g., Collect from Waterway Point MRT"
               />
-              {errors.dealMethod && <p className="text-red-500 text-xs mt-1">{errors.dealMethod}</p>}
+              {errors.dealMethod && (
+                <p className="text-red-500 text-xs mt-1">{errors.dealMethod}</p>
+              )}
             </div>
           </div>
 
           {/* Dimensions */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Dimensions *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Dimensions *
+            </label>
             <input
               type="text"
               required
@@ -370,16 +459,22 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
               className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown text-sm sm:text-base ${errors.dimensions ? "border-red-500" : "border-gray-300"}`}
               placeholder="e.g., 30cm x 20cm x 15cm"
             />
-            {errors.dimensions && <p className="text-red-500 text-xs mt-1">{errors.dimensions}</p>}
+            {errors.dimensions && (
+              <p className="text-red-500 text-xs mt-1">{errors.dimensions}</p>
+            )}
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
             <textarea
               rows={4}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brown/20 focus:border-brown resize-none text-sm sm:text-base"
               placeholder="Describe your item's condition, age, included accessories..."
             />
@@ -387,7 +482,9 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
 
           {/* Image Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Photos *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Photos *
+            </label>
             {imagePreview ? (
               <div className="relative">
                 <img
@@ -400,8 +497,18 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
                   onClick={removeImage}
                   className="absolute top-2 right-2 bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-50"
                 >
-                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -423,28 +530,53 @@ const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd }) => 
                   className="hidden"
                 />
                 <span className="inline-block bg-gray-100 rounded-full p-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11a4 4 0 118 0 4 4 0 01-8 0z" />
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 11a4 4 0 118 0 4 4 0 01-8 0z"
+                    />
                   </svg>
                 </span>
-                <span className="font-semibold text-lg text-gray-700">Add Photos</span>
-                <span className="text-sm text-gray-500">Take a photo or choose from your gallery to show your item</span>
+                <span className="font-semibold text-lg text-gray-700">
+                  Add Photos
+                </span>
+                <span className="text-sm text-gray-500">
+                  Take a photo or choose from your gallery to show your item
+                </span>
                 <button
                   type="button"
                   className="w-full sm:w-auto bg-brown text-white rounded-full px-4 py-2 font-bold mb-2"
-                  onClick={() => document.getElementById('takePhotoInput')?.click()}
+                  onClick={() =>
+                    document.getElementById("takePhotoInput")?.click()
+                  }
                 >
                   Take Photo
                 </button>
                 <button
                   type="button"
                   className="w-full sm:w-auto bg-gray-100 text-brown rounded-full px-4 py-2 font-bold"
-                  onClick={() => document.getElementById('uploadImageInput')?.click()}
+                  onClick={() =>
+                    document.getElementById("uploadImageInput")?.click()
+                  }
                 >
                   Choose from Gallery
                 </button>
-                <div className="mt-3 text-xs text-gray-500">Max file size: 5MB &bull; Formats: JPG, PNG, WEBP</div>
+                <div className="mt-3 text-xs text-gray-500">
+                  Max file size: 5MB &bull; Formats: JPG, PNG, WEBP
+                </div>
               </div>
             )}
           </div>

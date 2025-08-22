@@ -10,7 +10,7 @@ import AddListingModal from "../components/AddListingModal";
 import LoadingState from "../components/LoadingState";
 import EmptyState from "../components/EmptyState";
 import { saveProductToFirestore } from "../services/firebaseService";
-import { fetchProductsFromFirestore } from "../services/firebaseService";
+import { fetchProductsBySellerName } from "../services/firebaseService";
 import type { Product } from "../types";
 
 export default function ListingsPage() {
@@ -27,7 +27,7 @@ export default function ListingsPage() {
     if (!loading) setRefreshing(true);
     setLoading(true);
     try {
-      const products = await fetchProductsFromFirestore();
+      const products = await fetchProductsBySellerName("Current User");
       // Only show actual listings (not sold, not templates, etc)
       const listingStatuses = ["active", "pending", "draft"];
       const filtered = products.filter((p) =>
@@ -76,7 +76,9 @@ export default function ListingsPage() {
     <div className="min-h-screen bg-white">
       <Navbar
         centerContent={
-          <h1 className="text-lg font-bold font-wix text-brown">My Listings ({listings.length})</h1>
+          <h1 className="text-lg font-bold font-wix text-brown">
+            My Listings ({listings.length})
+          </h1>
         }
         onCategorySelect={onCategorySelect}
       />
