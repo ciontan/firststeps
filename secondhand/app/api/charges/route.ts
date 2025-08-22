@@ -4,6 +4,11 @@ import type { ChargeDetails } from "../../types.js";
 
 const COINBASE_COMMERCE_API_KEY = process.env.COINBASE_COMMERCE_API_KEY;
 
+console.log(
+  "COINBASE_COMMERCE_API_KEY:",
+  process.env.COINBASE_COMMERCE_API_KEY,
+);
+
 export async function POST(request: Request) {
   if (!COINBASE_COMMERCE_API_KEY) {
     return NextResponse.json(
